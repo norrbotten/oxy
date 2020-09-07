@@ -18,8 +18,32 @@ workspace "bigbong"
     
     filter { }
 
+function include_sfml()
+    includedirs { "ext/sfml/include" }
+    libdirs { "ext/sfml/build/lib" }
+    links { "sfml-graphics", "sfml-window", "sfml-system" }
+end
+
 project "bigbong"
     kind "ConsoleApp"
     files { "src/**.cpp" }
     includedirs { "src/" }
 
+    include_sfml()
+
+newaction {
+    trigger = "build",
+    description = "build",
+    execute = function()
+        os.execute("rm -rf build")
+        os.execute("premake5 gmake2 && cd build && make -j")
+    end
+}
+
+newaction {
+    trigger = "debug",
+    description = "debug",
+    execute = function()
+        os.execute("(premake5 gmake2 && cd build && make -j) && gdb -ex run ./build/bin/debug/bigbong")
+    end
+}

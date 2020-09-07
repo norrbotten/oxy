@@ -4,5 +4,12 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"C_Cpp.default.includePath": [
+			"./ext/sfml/include"
+		],
+		"clang-tidy.compilerArgs": [
+			"-I./ext/sfml/include"
+		]
+	}
 }
