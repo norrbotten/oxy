@@ -21,13 +21,16 @@ workspace "bigbong"
 function include_sfml()
     includedirs { "ext/sfml/include" }
     libdirs { "ext/sfml/build/lib" }
-    links { "sfml-graphics", "sfml-window", "sfml-system" }
+    links { "GL", "sfml-graphics", "sfml-window", "sfml-system" }
 end
 
 project "bigbong"
     kind "ConsoleApp"
-    files { "src/**.cpp" }
-    includedirs { "src/" }
+
+    files { "src/**.cpp", "ext/imgui/**.cpp", "ext/imgui-sfml/imgui-SFML.cpp" }
+    excludes { "ext/imgui/examples/**.cpp", "ext/imgui/misc/**.cpp" }
+
+    includedirs { "src/", "ext/imgui", "ext/imgui-sfml" }
 
     include_sfml()
 

@@ -6,10 +6,15 @@
 	],
 	"settings": {
 		"C_Cpp.default.includePath": [
-			"./ext/sfml/include"
+			"./ext/sfml/include",
+			"./ext/imgui-sfml",
+			"./ext/imgui",
 		],
 		"clang-tidy.compilerArgs": [
-			"-I./ext/sfml/include"
+			"-Iext/sfml/include",
+			"-Iext/sfml/src",
+			"-Iext/imgui-sfml",
+			"-Iext/imgui"
 		]
 	}
 }
