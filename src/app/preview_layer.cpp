@@ -9,7 +9,7 @@ namespace Oxy::Application {
         , m_preview_dirty(true)
         , m_preview_buffer(nullptr) {
 
-        resize(sf::Vector2u(5120, 5120));
+        resize(sf::Vector2u(512, 512));
         make_checkerboard();
     }
 

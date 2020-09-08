@@ -14,10 +14,23 @@ namespace Oxy::Application {
             ImGui::SFML::ProcessEvent(evnt);
 
             switch (evnt.type) {
-            case sf::Event::Closed: m_window.close(); break;
-            case sf::Event::Resized:
-                m_window.setView(sf::View(sf::FloatRect(0, 0, evnt.size.width, evnt.size.height)));
+            case sf::Event::Closed: {
+                m_window.close();
                 break;
+            }
+            case sf::Event::Resized: {
+                m_window.setView(sf::View(sf::FloatRect(0, 0, evnt.size.width, evnt.size.height)));
+
+                m_imgui_layer.params_window().window_width  = evnt.size.width;
+                m_imgui_layer.params_window().window_height = evnt.size.height;
+
+                if (m_imgui_layer.data_window().auto_resize_render_preview) {
+                    m_preview_layer.resize(sf::Vector2u(evnt.size.width, evnt.size.height));
+                    m_imgui_layer.params_window().render_width  = evnt.size.width;
+                    m_imgui_layer.params_window().render_height = evnt.size.height;
+                }
+                break;
+            }
             default: event_loop_handler(evnt); break;
             }
         }
