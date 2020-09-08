@@ -9,6 +9,8 @@ namespace Oxy::Application {
         PreviewLayer(sf::RenderWindow& window);
         ~PreviewLayer();
 
+        sf::Vector2u resolution() const { return m_preview_texture.getSize(); }
+
         void make_checkerboard();
 
         void resize(sf::Vector2u size);
