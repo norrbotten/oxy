@@ -1,12 +1,11 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-
-#include "app/preview_layer.hpp"
-
+#include <imgui-SFML.h>
 #include <imgui.h>
 
-#include <imgui-SFML.h>
+#include "app/preview_layer.hpp"
+#include "renderer/renderer.hpp"
 
 namespace Oxy::Application {
 
@@ -90,6 +89,10 @@ namespace Oxy::Application {
 
         void resize_render_preview(int width, int height) {
             m_preview_layer.resize(sf::Vector2u(width, height));
+            m_renderer.set_render_resolution(width, height);
+            m_renderer.render_fractal();
+
+            m_renderer.film().copy_to_rgba_buffer(m_preview_layer.get_mutable_buffer());
         }
 
         ImmediateData_Window             im_window_data;
@@ -102,6 +105,8 @@ namespace Oxy::Application {
         sf::Clock        m_clock;
 
         PreviewLayer m_preview_layer;
+
+        Renderer::OxyRenderer m_renderer;
     };
 
     template <UIEvent evnt, typename... Args>

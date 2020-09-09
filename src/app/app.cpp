@@ -6,7 +6,10 @@ namespace Oxy::Application {
 
     App::App(sf::Vector2u window_size)
         : m_window(sf::VideoMode(window_size.x, window_size.y), "bigbong")
-        , m_preview_layer(m_window) {}
+        , m_preview_layer(m_window, 512, 512) {
+
+        resize_render_preview(512, 512);
+    }
 
     void App::tick_loop_handler() {
         sf::Event evnt;
@@ -248,6 +251,8 @@ namespace Oxy::Application {
 
     void App::run() {
         ImGui::SFML::Init(m_window);
+
+        resize_render_preview(512, 512);
 
         ui_event<Initialize>{}(*this);
 

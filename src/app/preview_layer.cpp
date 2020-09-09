@@ -4,12 +4,12 @@
 
 namespace Oxy::Application {
 
-    PreviewLayer::PreviewLayer(sf::RenderWindow& window)
+    PreviewLayer::PreviewLayer(sf::RenderWindow& window, int width, int height)
         : m_window(window)
         , m_preview_dirty(true)
         , m_preview_buffer(nullptr) {
 
-        resize(sf::Vector2u(512, 512));
+        resize(sf::Vector2u(width, height));
         make_checkerboard();
     }
 
@@ -56,6 +56,8 @@ namespace Oxy::Application {
             m_preview_dirty = false;
 
             m_preview_texture.update(m_preview_buffer);
+            m_preview_texture.setSmooth(true);
+
             m_preview_sprite.setTexture(m_preview_texture, true);
         }
 

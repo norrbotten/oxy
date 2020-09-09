@@ -6,7 +6,7 @@ namespace Oxy::Application {
 
     class PreviewLayer {
     public:
-        PreviewLayer(sf::RenderWindow& window);
+        PreviewLayer(sf::RenderWindow& window, int width, int height);
         ~PreviewLayer();
 
         sf::Vector2u resolution() const { return m_preview_texture.getSize(); }
@@ -15,6 +15,8 @@ namespace Oxy::Application {
 
         void resize(sf::Vector2u size);
         void draw();
+
+        auto* get_mutable_buffer() { return (char*)m_preview_buffer; }
 
     private:
         sf::RenderWindow& m_window;
