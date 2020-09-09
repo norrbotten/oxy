@@ -12,8 +12,11 @@ namespace Oxy::Application {
 
     enum UIEvent {
         Initialize,
+
         WindowResized,
         RenderResolutionChanged,
+
+        RenderPreviewModeToggled,
     };
 
     struct ImmediateData_Window {
@@ -27,6 +30,42 @@ namespace Oxy::Application {
 
         char input_render_width[16];
         char input_render_height[16];
+    };
+
+    struct ImmediateData_RenderSettings {
+        bool preview = false;
+
+        const char* preview_modes[4] = {"Albedo", "Normal", "Flat", "Triangle"};
+        const char* preview_help[4]  = {"Show object colors only", "Show world space normals",
+                                       "Show with flat shading", "Colorize triangles randomly"};
+        int         preview_mode     = 0;
+
+        const char* rendering_modes[2]      = {"Raytracing", "Pathtracing"};
+        const char* rendering_modes_help[2] = {"Simple raytracing, no indirect lighting",
+                                               "Full pathtracing, global illumination"};
+        int         rendering_mode          = 0;
+
+        bool continous_sampling = true;
+        int  max_samples        = 64;
+    };
+
+    struct ImmediateData_RaytracingSettings {
+        const char* supersampling_modes[4]      = {"1x", "2x", "4x", "8x"};
+        const char* supersampling_modes_help[4] = {"Same as default", "Sample 4 times per pixel",
+                                                   "Sample 16 times per pixel",
+                                                   "Sample 64 times per pixel"};
+        int         supersampling_mode          = 1;
+    };
+
+    struct ImmediateData_PathtracerSettings {
+        const char* pathtracer_integrators[5] = {"Naive", "Naive-Direct sampling", "BDPT", "MLT",
+                                                 "MLT+BDPT"};
+        const char* pathtracer_integrators_help[5] = {
+            "Simplest possible algorithm, very slow and noisy",
+            "Same as naive, but sample lights implicitly",
+            "Bidirectional path tracing, better at rendering indirect light and caustics",
+            "Metropolis light transport", "Metropolis light transport combined with BDPT"};
+        int pathtracer_integrator = 0;
     };
 
     class App final {
@@ -45,7 +84,10 @@ namespace Oxy::Application {
             m_preview_layer.resize(sf::Vector2u(width, height));
         }
 
-        ImmediateData_Window m_window_data;
+        ImmediateData_Window             im_window_data;
+        ImmediateData_RenderSettings     im_render_data;
+        ImmediateData_RaytracingSettings im_rt_data;
+        ImmediateData_PathtracerSettings im_pt_data;
 
     private:
         sf::RenderWindow m_window;
@@ -62,31 +104,31 @@ namespace Oxy::Application {
     template <>
     struct ui_event<Initialize> {
         void operator()(App& app) {
-            app.m_window_data.window_width  = app.window_size().x;
-            app.m_window_data.window_height = app.window_size().y;
+            app.im_window_data.window_width  = app.window_size().x;
+            app.im_window_data.window_height = app.window_size().y;
 
-            app.m_window_data.render_width  = app.render_preview_resolution().x;
-            app.m_window_data.render_height = app.render_preview_resolution().y;
+            app.im_window_data.render_width  = app.render_preview_resolution().x;
+            app.im_window_data.render_height = app.render_preview_resolution().y;
 
-            snprintf(app.m_window_data.input_render_width, 16, "%i",
-                     app.m_window_data.render_width);
-            snprintf(app.m_window_data.input_render_height, 16, "%i",
-                     app.m_window_data.render_height);
+            snprintf(app.im_window_data.input_render_width, 16, "%i",
+                     app.im_window_data.render_width);
+            snprintf(app.im_window_data.input_render_height, 16, "%i",
+                     app.im_window_data.render_height);
         }
     };
 
     template <>
     struct ui_event<WindowResized> {
         void operator()(App& app, int width, int height) {
-            app.m_window_data.window_width  = width;
-            app.m_window_data.window_height = height;
+            app.im_window_data.window_width  = width;
+            app.im_window_data.window_height = height;
 
-            if (app.m_window_data.auto_resize_render_preview) {
-                app.m_window_data.render_width  = width;
-                app.m_window_data.render_height = height;
+            if (app.im_window_data.auto_resize_render_preview) {
+                app.im_window_data.render_width  = width;
+                app.im_window_data.render_height = height;
 
-                snprintf(app.m_window_data.input_render_width, 16, "%i", width);
-                snprintf(app.m_window_data.input_render_height, 16, "%i", height);
+                snprintf(app.im_window_data.input_render_width, 16, "%i", width);
+                snprintf(app.im_window_data.input_render_height, 16, "%i", height);
 
                 app.resize_render_preview(width, height);
             }
@@ -114,19 +156,24 @@ namespace Oxy::Application {
                 if (height_val < 1)
                     height_val = 1;
 
-                app.m_window_data.render_width  = width_val;
-                app.m_window_data.render_height = height_val;
+                app.im_window_data.render_width  = width_val;
+                app.im_window_data.render_height = height_val;
 
-                snprintf(app.m_window_data.input_render_width, 16, "%i", width_val);
-                snprintf(app.m_window_data.input_render_height, 16, "%i", height_val);
+                snprintf(app.im_window_data.input_render_width, 16, "%i", width_val);
+                snprintf(app.im_window_data.input_render_height, 16, "%i", height_val);
             }
             catch (...) {
-                width_val  = app.m_window_data.render_width;
-                height_val = app.m_window_data.render_height;
+                width_val  = app.im_window_data.render_width;
+                height_val = app.im_window_data.render_height;
             }
 
             app.resize_render_preview(width_val, height_val);
         }
+    };
+
+    template <>
+    struct ui_event<RenderPreviewModeToggled> {
+        void operator()(App& app, bool on) {}
     };
 
 } // namespace Oxy::Application

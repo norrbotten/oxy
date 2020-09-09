@@ -5,7 +5,7 @@
 namespace Oxy::Application {
 
     App::App(sf::Vector2u window_size)
-        : m_window(sf::VideoMode(window_size.x, window_size.y), "Oxy")
+        : m_window(sf::VideoMode(window_size.x, window_size.y), "bigbong")
         , m_preview_layer(m_window) {}
 
     void App::tick_loop_handler() {
@@ -48,26 +48,178 @@ namespace Oxy::Application {
 
         if (ImGui::TreeNode("Window")) {
             ImGui::Checkbox("Auto-resize render preview",
-                            &m_window_data.auto_resize_render_preview);
+                            &im_window_data.auto_resize_render_preview);
             ImGui::SameLine();
             HelpMarker("Resize the render resolution when the window is resized");
 
-            ImGui::Separator();
+            ImGui::Spacing();
 
-            if (ImGui::InputText("Render Width", m_window_data.input_render_width, 16)) {
-                ui_event<RenderResolutionChanged>{}(*this, m_window_data.input_render_width,
-                                                    m_window_data.input_render_height);
+            ImGui::Text("Render Width");
+            if (ImGui::InputText("##a", im_window_data.input_render_width, 16)) {
+                ui_event<RenderResolutionChanged>{}(*this, im_window_data.input_render_width,
+                                                    im_window_data.input_render_height);
             }
 
-            if (ImGui::InputText("Render Height", m_window_data.input_render_height, 16)) {
-                ui_event<RenderResolutionChanged>{}(*this, m_window_data.input_render_width,
-                                                    m_window_data.input_render_height);
+            ImGui::Text("Render Height");
+            if (ImGui::InputText("##b", im_window_data.input_render_height, 16)) {
+                ui_event<RenderResolutionChanged>{}(*this, im_window_data.input_render_width,
+                                                    im_window_data.input_render_height);
             }
 
-            ImGui::Text("Window Width: %i", m_window_data.window_width);
-            ImGui::Text("Window Height: %i", m_window_data.window_height);
+            ImGui::Spacing();
 
-            ImGui::Separator();
+            ImGui::Text("Window Width: %i", im_window_data.window_width);
+            ImGui::Text("Window Height: %i", im_window_data.window_height);
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Render Settings")) {
+            if (ImGui::Checkbox("Enable Preview", &im_render_data.preview)) {
+                ui_event<RenderPreviewModeToggled>{}(*this, im_render_data.preview);
+            }
+
+            ImGui::SameLine();
+            HelpMarker("A simpler rendering mode for fast preview");
+
+            ImGui::Spacing();
+
+            ImGui::Text("Preview Mode");
+
+            if (ImGui::BeginCombo("##1",
+                                  im_render_data.preview_modes[im_render_data.preview_mode])) {
+
+                for (int i = 0; i < IM_ARRAYSIZE(im_render_data.preview_modes); i++) {
+                    auto selected = (i == im_render_data.preview_mode);
+                    auto label    = im_render_data.preview_modes[i];
+
+                    if (ImGui::Selectable(label, selected)) {
+                        im_render_data.preview_mode = i;
+                        selected                    = true;
+                    }
+
+                    ImGui::SameLine();
+                    HelpMarker(im_render_data.preview_help[i]);
+
+                    if (selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+
+                ImGui::EndCombo();
+            }
+
+            ImGui::Spacing();
+
+            ImGui::Text("Rendering Algorithm");
+
+            if (ImGui::BeginCombo("##2",
+                                  im_render_data.rendering_modes[im_render_data.rendering_mode])) {
+
+                for (int i = 0; i < IM_ARRAYSIZE(im_render_data.rendering_modes); i++) {
+                    auto selected = (i == im_render_data.rendering_mode);
+                    auto label    = im_render_data.rendering_modes[i];
+
+                    if (ImGui::Selectable(label, selected)) {
+                        im_render_data.rendering_mode = i;
+                        selected                      = true;
+                    }
+
+                    ImGui::SameLine();
+                    HelpMarker(im_render_data.rendering_modes_help[i]);
+
+                    if (selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+
+                ImGui::EndCombo();
+            }
+
+            ImGui::Spacing();
+
+            if (ImGui::InputInt("Max samples", &im_render_data.max_samples, 1, 100)) {
+                if (im_render_data.max_samples < 1) {
+                    im_render_data.max_samples = 1;
+                }
+
+                if (im_render_data.max_samples > 1e9) {
+                    im_render_data.max_samples = 1e9;
+                }
+            }
+
+            ImGui::Spacing();
+
+            ImGui::Checkbox("Continous sampling", &im_render_data.continous_sampling);
+            ImGui::SameLine();
+            HelpMarker("Don't stop at max samples");
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Raytracer Settings")) {
+            ImGui::Text("Supersampling mode");
+
+            if (ImGui::BeginCombo("##3",
+                                  im_rt_data.supersampling_modes[im_rt_data.supersampling_mode])) {
+
+                for (int i = 0; i < IM_ARRAYSIZE(im_rt_data.supersampling_modes); i++) {
+                    auto selected = (i == im_rt_data.supersampling_mode);
+                    auto label    = im_rt_data.supersampling_modes[i];
+
+                    if (ImGui::Selectable(label, selected)) {
+                        im_rt_data.supersampling_mode = i;
+                        selected                      = true;
+                    }
+
+                    ImGui::SameLine();
+                    HelpMarker(im_rt_data.supersampling_modes_help[i]);
+
+                    if (selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+
+                ImGui::EndCombo();
+            }
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNode("Pathtracer Settings")) {
+            ImGui::Text("Pathtracing Method");
+
+            if (ImGui::BeginCombo(
+                    "##4", im_pt_data.pathtracer_integrators[im_pt_data.pathtracer_integrator])) {
+
+                for (int i = 0; i < IM_ARRAYSIZE(im_pt_data.pathtracer_integrators); i++) {
+                    auto selected = (i == im_pt_data.pathtracer_integrator);
+                    auto label    = im_pt_data.pathtracer_integrators[i];
+
+                    if (ImGui::Selectable(label, selected)) {
+                        im_pt_data.pathtracer_integrator = i;
+                        selected                         = true;
+                    }
+
+                    ImGui::SameLine();
+                    HelpMarker(im_pt_data.pathtracer_integrators_help[i]);
+
+                    if (selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+
+                ImGui::EndCombo();
+            }
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+
             ImGui::TreePop();
         }
 
