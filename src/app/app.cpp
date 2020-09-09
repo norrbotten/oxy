@@ -79,7 +79,7 @@ namespace Oxy::Application {
 
         if (ImGui::TreeNode("Render Settings")) {
             if (ImGui::Checkbox("Enable Preview", &im_render_data.preview)) {
-                ui_event<RenderPreviewModeToggled>{}(*this, im_render_data.preview);
+                ui_event<RenderPreviewEnabledToggled>{}(*this, im_render_data.preview);
             }
 
             ImGui::SameLine();
@@ -99,6 +99,8 @@ namespace Oxy::Application {
                     if (ImGui::Selectable(label, selected)) {
                         im_render_data.preview_mode = i;
                         selected                    = true;
+
+                        ui_event<RenderPreviewModeChanged>{}(*this, i);
                     }
 
                     ImGui::SameLine();
@@ -125,6 +127,8 @@ namespace Oxy::Application {
                     if (ImGui::Selectable(label, selected)) {
                         im_render_data.rendering_mode = i;
                         selected                      = true;
+
+                        ui_event<RenderAlgorithmChanged>{}(*this, i);
                     }
 
                     ImGui::SameLine();
@@ -147,11 +151,16 @@ namespace Oxy::Application {
                 if (im_render_data.max_samples > 1e9) {
                     im_render_data.max_samples = 1e9;
                 }
+
+                ui_event<RenderMaxSamplesChanged>{}(*this, im_render_data.max_samples);
             }
 
             ImGui::Spacing();
 
-            ImGui::Checkbox("Continous sampling", &im_render_data.continous_sampling);
+            if (ImGui::Checkbox("Continous sampling", &im_render_data.continous_sampling)) {
+                ui_event<RenderContinousSamplingToggled>{}(*this,
+                                                           im_render_data.continous_sampling);
+            }
             ImGui::SameLine();
             HelpMarker("Don't stop at max samples");
 
@@ -174,6 +183,8 @@ namespace Oxy::Application {
                     if (ImGui::Selectable(label, selected)) {
                         im_rt_data.supersampling_mode = i;
                         selected                      = true;
+
+                        ui_event<RaytracerSupersamplingChanged>{}(*this, i);
                     }
 
                     ImGui::SameLine();
@@ -205,6 +216,8 @@ namespace Oxy::Application {
                     if (ImGui::Selectable(label, selected)) {
                         im_pt_data.pathtracer_integrator = i;
                         selected                         = true;
+
+                        ui_event<PathtracerMethodChanged>{}(*this, i);
                     }
 
                     ImGui::SameLine();

@@ -16,7 +16,15 @@ namespace Oxy::Application {
         WindowResized,
         RenderResolutionChanged,
 
-        RenderPreviewModeToggled,
+        RenderPreviewEnabledToggled,
+        RenderPreviewModeChanged,
+        RenderAlgorithmChanged,
+        RenderMaxSamplesChanged,
+        RenderContinousSamplingToggled,
+
+        RaytracerSupersamplingChanged,
+
+        PathtracerMethodChanged,
     };
 
     struct ImmediateData_Window {
@@ -172,8 +180,38 @@ namespace Oxy::Application {
     };
 
     template <>
-    struct ui_event<RenderPreviewModeToggled> {
+    struct ui_event<RenderPreviewEnabledToggled> {
         void operator()(App& app, bool on) {}
+    };
+
+    template <>
+    struct ui_event<RenderPreviewModeChanged> {
+        void operator()(App& app, int mode) {}
+    };
+
+    template <>
+    struct ui_event<RenderAlgorithmChanged> {
+        void operator()(App& app, int mode) {}
+    };
+
+    template <>
+    struct ui_event<RenderMaxSamplesChanged> {
+        void operator()(App& app, int num_samples) {}
+    };
+
+    template <>
+    struct ui_event<RenderContinousSamplingToggled> {
+        void operator()(App& app, bool on) {}
+    };
+
+    template <>
+    struct ui_event<RaytracerSupersamplingChanged> {
+        void operator()(App& app, int level) {}
+    };
+
+    template <>
+    struct ui_event<PathtracerMethodChanged> {
+        void operator()(App& app, int method) {}
     };
 
 } // namespace Oxy::Application
