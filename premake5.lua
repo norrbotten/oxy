@@ -27,10 +27,10 @@ end
 project "bigbong"
     kind "ConsoleApp"
 
-    files { "src/**.cpp", "ext/imgui/**.cpp", "ext/imgui-sfml/imgui-SFML.cpp" }
+    files { "src/**.cpp", "ext/imgui/**.cpp", "ext/imgui-sfml/imgui-SFML.cpp", "ext/glm/glm/**.cpp" }
     excludes { "ext/imgui/examples/**.cpp", "ext/imgui/misc/**.cpp" }
 
-    includedirs { "src/", "ext/imgui", "ext/imgui-sfml" }
+    includedirs { "src/", "ext/imgui", "ext/imgui-sfml", "ext/glm" }
 
     include_sfml()
 
