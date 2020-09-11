@@ -2,6 +2,24 @@
 
 #include <iostream>
 
+namespace ImGui {
+
+    bool Button(const char* text, bool disabled) {
+        if (disabled) {
+            PushStyleVar(ImGuiStyleVar_Alpha, GetStyle().Alpha * 0.5f);
+        }
+
+        auto button_res = Button(text);
+
+        if (disabled) {
+            PopStyleVar();
+        }
+
+        return disabled ? false : button_res;
+    }
+
+} // namespace ImGui
+
 namespace Oxy::Application {
 
     App::App(sf::Vector2u window_size)
@@ -241,10 +259,35 @@ namespace Oxy::Application {
 
         ImGui::End();
 
+        ImGui::Begin("Render Control");
+
+        if (ImGui::Button("Start", m_renderer.running())) {
+            ui_event<RenderControlStart>{}(*this);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Pause", !m_renderer.running())) {
+            ui_event<RenderControlPause>{}(*this);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Reset", m_renderer.running())) {
+            ui_event<RenderControlReset>{}(*this);
+        }
+
+        ImGui::End();
+
         m_preview_layer.draw();
         ImGui::SFML::Render(m_window);
 
         m_window.display();
+
+        if (!m_renderer.has_block()) {
+            m_renderer.generate_blocks();
+            m_renderer.film().copy_to_rgba_buffer(m_preview_layer.get_mutable_buffer());
+        }
     }
 
     void App::event_loop_handler(sf::Event& evnt) {}
@@ -252,7 +295,11 @@ namespace Oxy::Application {
     void App::run() {
         ImGui::SFML::Init(m_window);
 
-        resize_render_preview(512, 512);
+        m_renderer.select_integrator(Renderer::Integrators::Fractal);
+        resize_render_preview(1024, 1024);
+
+        m_renderer.camera().set_pos(glm::dvec3(0, 0, -5));
+        m_renderer.camera().aim(glm::dvec3(0, 0, 0));
 
         ui_event<Initialize>{}(*this);
 

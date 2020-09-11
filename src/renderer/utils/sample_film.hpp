@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "renderer/utils/color.hpp"
 
 namespace Oxy::Renderer {
@@ -32,6 +34,16 @@ namespace Oxy::Renderer {
 
                     buffer += 4;
                 }
+        }
+
+        void clear() {
+            if (m_cumulative_buffer != nullptr)
+                for (unsigned int i = 0; i < 3 * m_width * m_height; i++)
+                    m_cumulative_buffer[i] = 0.0;
+
+            if (m_sample_count != nullptr)
+                for (unsigned int i = 0; i < m_width * m_height; i++)
+                    m_sample_count[i] = 0;
         }
 
     private:

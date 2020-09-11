@@ -32,6 +32,8 @@ project "bigbong"
 
     includedirs { "src/", "ext/imgui", "ext/imgui-sfml", "ext/glm" }
 
+    links "pthread"
+
     include_sfml()
 
 newaction {

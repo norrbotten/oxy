@@ -16,7 +16,10 @@ namespace Oxy::Application {
         void resize(sf::Vector2u size);
         void draw();
 
-        auto* get_mutable_buffer() { return (char*)m_preview_buffer; }
+        auto* get_mutable_buffer() {
+            m_preview_dirty = true;
+            return (char*)m_preview_buffer;
+        }
 
     private:
         sf::RenderWindow& m_window;

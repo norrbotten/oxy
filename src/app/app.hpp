@@ -24,6 +24,10 @@ namespace Oxy::Application {
         RaytracerSupersamplingChanged,
 
         PathtracerMethodChanged,
+
+        RenderControlStart,
+        RenderControlPause,
+        RenderControlReset,
     };
 
     struct ImmediateData_Window {
@@ -90,10 +94,13 @@ namespace Oxy::Application {
         void resize_render_preview(int width, int height) {
             m_preview_layer.resize(sf::Vector2u(width, height));
             m_renderer.set_render_resolution(width, height);
-            m_renderer.render_fractal();
-
-            m_renderer.film().copy_to_rgba_buffer(m_preview_layer.get_mutable_buffer());
         }
+
+        void start_render() { m_renderer.start_render(); }
+
+        void pause_render() { m_renderer.pause_render(); }
+
+        void reset_render() { m_renderer.reset_render(); }
 
         ImmediateData_Window             im_window_data;
         ImmediateData_RenderSettings     im_render_data;
@@ -217,6 +224,21 @@ namespace Oxy::Application {
     template <>
     struct ui_event<PathtracerMethodChanged> {
         void operator()(App& app, int method) {}
+    };
+
+    template <>
+    struct ui_event<RenderControlStart> {
+        void operator()(App& app) { app.start_render(); }
+    };
+
+    template <>
+    struct ui_event<RenderControlPause> {
+        void operator()(App& app) { app.pause_render(); }
+    };
+
+    template <>
+    struct ui_event<RenderControlReset> {
+        void operator()(App& app) { app.reset_render(); }
     };
 
 } // namespace Oxy::Application

@@ -56,9 +56,9 @@ namespace Oxy::Renderer {
             if (num_samples == 0)
                 return Color();
 
-            double r = m_cumulative_buffer[3 * (x + y * m_width) + 0];
-            double g = m_cumulative_buffer[3 * (x + y * m_width) + 1];
-            double b = m_cumulative_buffer[3 * (x + y * m_width) + 2];
+            double r = m_cumulative_buffer[3 * (x + y * m_width) + 0] / num_samples;
+            double g = m_cumulative_buffer[3 * (x + y * m_width) + 1] / num_samples;
+            double b = m_cumulative_buffer[3 * (x + y * m_width) + 2] / num_samples;
 
             return {expose(r, exposure), expose(g, exposure), expose(b, exposure)};
         }

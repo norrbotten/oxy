@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "renderer/accel/bvh.hpp"
+#include "renderer/utils/camera.hpp"
 
 namespace Oxy::Renderer {
 

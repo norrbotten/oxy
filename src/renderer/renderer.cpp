@@ -2,50 +2,68 @@
 
 namespace Oxy::Renderer {
 
-    OxyRenderer::OxyRenderer() {}
+    OxyRenderer::OxyRenderer()
+        : m_integrator(nullptr)
+        , m_running(false) {}
 
-    void OxyRenderer::render_fractal() {
-        auto width  = m_film.width();
-        auto height = m_film.height();
+    OxyRenderer::~OxyRenderer() {
+        if (m_integrator != nullptr)
+            delete m_integrator;
+    }
 
-        double aspect = (double)height / (double)width;
+    void OxyRenderer::start_render(int num_threads) {
+        m_running = true;
 
-        constexpr int max_iters = 64;
+        if (num_threads > m_workers.size()) {
+            for (int i = m_worker_state.size(); i < num_threads; i++) {
+                auto id = m_workers.size();
 
-        constexpr double radius      = 2.5;
-        constexpr double real_offset = -0.7;
-        constexpr double imag_offset = 0;
+                m_worker_state.push_back(WorkerState::Rendering);
+                m_workers.push_back(std::thread(
+                    [&](int id) {
+                        while (true) {
+                            auto state = this->worker_state(id);
+                            if (state == WorkerState::Stopped)
+                                break;
 
-        auto fractal = [width, height, aspect](int x, int y) -> double {
-            double cx = 2 * ((double)x / width - 0.5) * radius + real_offset;
-            double cy = aspect * 2 * ((double)y / height - 0.5) * radius + imag_offset;
+                            if (state == WorkerState::Rendering)
+                                if (auto block = this->aquire_block(); block.has_value())
+                                    this->render_block(block.value());
 
-            double zx = 0, zy = 0;
-
-            for (int i = 0; i < max_iters; i++) {
-                auto temp = zx * zx - zy * zy + cx;
-                zy        = 2 * zx * zy + cy;
-                zx        = temp;
-
-                if ((zx * zx + zy * zy) > 4)
-                    return (double)i / max_iters;
+                            if (state == WorkerState::Paused) {
+                                using namespace std::chrono_literals;
+                                std::this_thread::sleep_for(10ms);
+                            }
+                            else
+                                std::this_thread::yield();
+                        }
+                    },
+                    id));
             }
+        }
+    }
 
-            return 1.0;
-        };
+    void OxyRenderer::pause_render() {
+        m_running = false;
 
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++) {
-                auto frac = fractal(x, y);
+        for (int i = 0; i < m_worker_state.size(); i++)
+            m_worker_state[i] = WorkerState::Paused;
+    }
 
-                Color col;
-                if (frac == 1.0)
-                    col = {0, 0, 0};
-                else
-                    col = {frac, 0, 1 - frac};
+    void OxyRenderer::reset_render() {
+        m_running = false;
 
-                m_film.splat(x, y, col);
-            }
+        for (int i = 0; i < m_worker_state.size(); i++)
+            m_worker_state[i] = WorkerState::Stopped;
+
+        for (auto& thread : m_workers)
+            if (thread.joinable())
+                thread.join();
+
+        m_worker_state.clear();
+        m_workers.clear();
+
+        m_film.clear();
     }
 
 } // namespace Oxy::Renderer
