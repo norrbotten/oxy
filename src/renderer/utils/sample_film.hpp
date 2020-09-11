@@ -20,11 +20,11 @@ namespace Oxy::Renderer {
 
         Color get(int x, int y, double exposure = 1.0) const;
 
-        void copy_to_rgba_buffer(char* buffer) const {
+        void copy_to_rgba_buffer(char* buffer, double exposure = 1.0) const {
             for (int y = 0; y < m_height; y++)
                 for (int x = 0; x < m_width; x++) {
                     char r, g, b, a = (char)255;
-                    auto col = get(x, y);
+                    auto col = get(x, y, exposure);
                     col.to_chars(r, g, b);
 
                     *(buffer + 0) = r;

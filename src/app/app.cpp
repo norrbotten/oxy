@@ -138,7 +138,7 @@ namespace Oxy::Application {
 
             ImGui::Text("Rendering Algorithm");
 
-            if (ImGui::BeginCombo("##2",
+            if (ImGui::BeginCombo("##0.2",
                                   im_render_data.rendering_modes[im_render_data.rendering_mode])) {
 
                 for (int i = 0; i < IM_ARRAYSIZE(im_render_data.rendering_modes); i++) {
@@ -184,6 +184,10 @@ namespace Oxy::Application {
             }
             ImGui::SameLine();
             HelpMarker("Don't stop at max samples");
+
+            ImGui::Spacing();
+
+            ImGui::SliderFloat("Exposure", &im_render_data.exposure, 0.1, 30, "%f", 1);
 
             ImGui::Spacing();
             ImGui::Spacing();
@@ -261,6 +265,11 @@ namespace Oxy::Application {
 
         ImGui::Begin("Render Control");
 
+        ImGui::Text("Render State: %s", m_renderer.state_str());
+        ImGui::Text("Samples Done: %i", m_renderer.samples_done());
+
+        ImGui::Spacing();
+
         if (ImGui::Button("Start", m_renderer.running())) {
             ui_event<RenderControlStart>{}(*this);
         }
@@ -286,7 +295,8 @@ namespace Oxy::Application {
 
         if (!m_renderer.has_block()) {
             m_renderer.generate_blocks();
-            m_renderer.film().copy_to_rgba_buffer(m_preview_layer.get_mutable_buffer());
+            m_renderer.film().copy_to_rgba_buffer(m_preview_layer.get_mutable_buffer(),
+                                                  im_render_data.exposure);
         }
     }
 
@@ -295,7 +305,7 @@ namespace Oxy::Application {
     void App::run() {
         ImGui::SFML::Init(m_window);
 
-        m_renderer.select_integrator(Renderer::Integrators::Fractal);
+        m_renderer.select_integrator(Renderer::Integrators::Buddhabrot);
         resize_render_preview(1024, 1024);
 
         m_renderer.camera().set_pos(glm::dvec3(0, 0, -5));

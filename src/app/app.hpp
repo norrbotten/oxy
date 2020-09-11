@@ -58,6 +58,8 @@ namespace Oxy::Application {
 
         bool continous_sampling = true;
         int  max_samples        = 64;
+
+        float exposure = 1;
     };
 
     struct ImmediateData_RaytracingSettings {

@@ -3,57 +3,58 @@
 #include "renderer/accel/accelerator.hpp"
 #include "renderer/utils/camera.hpp"
 #include "renderer/utils/color.hpp"
+#include "renderer/utils/random.hpp"
+#include "renderer/utils/sample_film.hpp"
 
 namespace Oxy::Renderer {
 
     enum class Integrators {
         Fractal,
+        Buddhabrot,
     };
 
     class Integrator {
     public:
-        Integrator();
-        virtual ~Integrator() = default;
+        Integrator(int width, int height, SampleFilm& film)
+            : m_width(width)
+            , m_height(height)
+            , m_film(film) {}
 
-        virtual Color integrate(const CameraRay& camray) = 0;
+        virtual ~Integrator() = default;
 
         auto& accel() { return m_accel; }
 
-    private:
+        virtual Color integrate(const CameraRay& camray) = 0;
+
+        void set_resolution(int width, int height) {
+            m_width  = width;
+            m_height = height;
+        }
+
+    protected:
         Accelerator m_accel;
+        int         m_width, m_height;
+        SampleFilm& m_film;
     };
 
     class FractalIntegrator final : public Integrator {
     public:
-        FractalIntegrator() {}
+        FractalIntegrator(int width, int height, SampleFilm& film)
+            : Integrator(width, height, film) {}
+
         virtual ~FractalIntegrator() override {}
 
-        virtual Color integrate(const CameraRay& camray) override {
-            auto fractal = [](double cx, double cy) -> double {
-                double zx = 0, zy = 0;
+        virtual Color integrate(const CameraRay& camray) override;
+    };
 
-                for (int i = 0; i < 512; i++) {
-                    auto temp = zx * zx - zy * zy + cx;
-                    zy        = 2 * zx * zy + cy;
-                    zx        = temp;
+    class BuddhabrotIntegrator final : public Integrator {
+    public:
+        BuddhabrotIntegrator(int width, int height, SampleFilm& film)
+            : Integrator(width, height, film) {}
 
-                    if ((zx * zx + zy * zy) > 4)
-                        return (double)i / 512;
-                }
+        virtual ~BuddhabrotIntegrator() override {}
 
-                return 1.0;
-            };
-
-            auto fac = fractal(camray.origin.x, camray.origin.y);
-
-            Color col;
-            if (fac == 1.0)
-                col = {0, 0, 0};
-            else
-                col = {fac, 0, 0};
-
-            return col;
-        }
+        virtual Color integrate(const CameraRay& camray) override;
     };
 
 } // namespace Oxy::Renderer

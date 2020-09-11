@@ -4,7 +4,8 @@ namespace Oxy::Renderer {
 
     OxyRenderer::OxyRenderer()
         : m_integrator(nullptr)
-        , m_running(false) {}
+        , m_running(false)
+        , m_state(WorkerState::Stopped) {}
 
     OxyRenderer::~OxyRenderer() {
         if (m_integrator != nullptr)
@@ -13,6 +14,7 @@ namespace Oxy::Renderer {
 
     void OxyRenderer::start_render(int num_threads) {
         m_running = true;
+        m_state   = WorkerState::Rendering;
 
         for (int i = 0; i < m_worker_state.size(); i++)
             m_worker_state[i] = WorkerState::Rendering;
@@ -48,6 +50,7 @@ namespace Oxy::Renderer {
 
     void OxyRenderer::pause_render() {
         m_running = false;
+        m_state   = WorkerState::Paused;
 
         for (int i = 0; i < m_worker_state.size(); i++)
             m_worker_state[i] = WorkerState::Paused;
@@ -55,6 +58,7 @@ namespace Oxy::Renderer {
 
     void OxyRenderer::reset_render() {
         m_running = false;
+        m_state   = WorkerState::Stopped;
 
         for (int i = 0; i < m_worker_state.size(); i++)
             m_worker_state[i] = WorkerState::Stopped;
@@ -67,6 +71,9 @@ namespace Oxy::Renderer {
         m_workers.clear();
 
         m_film.clear();
+
+        m_blocks.clear();
+        m_samples_done = 0;
     }
 
 } // namespace Oxy::Renderer

@@ -49,7 +49,7 @@ namespace Oxy::Renderer {
     }
 
     Color SampleFilm::get(int x, int y, double exposure) const {
-        auto expose = [](double val, double fac) -> double { return std::pow(val, fac) * fac; };
+        auto expose = [](double val, double fac) -> double { return std::pow(val, fac); };
 
         if (x >= 0 && y >= 0 && x < m_width && y < m_height) {
             auto num_samples = m_sample_count[x + y * m_width];

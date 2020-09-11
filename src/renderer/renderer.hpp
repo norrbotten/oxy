@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "renderer/integrators/integrator.hpp"
-#include "renderer/utils/random.hpp"
 #include "renderer/utils/sample_film.hpp"
 
 namespace Oxy::Renderer {
@@ -31,14 +30,25 @@ namespace Oxy::Renderer {
         auto get_render_width() const { return m_film.width(); }
         auto get_render_height() const { return m_film.height(); }
 
-        void set_render_resolution(int width, int height) { m_film.resize(width, height); }
+        void set_render_resolution(int width, int height) {
+            if (m_integrator != nullptr)
+                m_integrator->set_resolution(width, height);
+
+            m_film.resize(width, height);
+        }
 
         void select_integrator(Integrators integrator) {
             if (m_integrator != nullptr)
                 delete m_integrator;
 
             switch (integrator) {
-            case Integrators::Fractal: m_integrator = new FractalIntegrator(); break;
+            case Integrators::Fractal:
+                m_integrator = new FractalIntegrator(m_film.width(), m_film.height(), m_film);
+                break;
+
+            case Integrators::Buddhabrot:
+                m_integrator = new BuddhabrotIntegrator(m_film.width(), m_film.height(), m_film);
+                break;
             }
 
             m_film.clear();
@@ -57,6 +67,18 @@ namespace Oxy::Renderer {
 
         const WorkerState worker_state(int id) const { return m_worker_state[id]; }
 
+        const char* state_str() const {
+            switch (m_state) {
+            case WorkerState::Rendering: return "Running";
+            case WorkerState::Paused: return "Paused";
+            case WorkerState::Stopped: return "Stopped";
+            }
+
+            return "";
+        }
+
+        const auto samples_done() const { return m_samples_done - 1; }
+
         void generate_blocks() {
             std::lock_guard g(m_blocks_mtx);
 
@@ -67,6 +89,8 @@ namespace Oxy::Renderer {
                     m_blocks.push_back(Block{x, y, std::min(m_film.width(), x + 32),
                                              std::min(m_film.height(), y + 32)});
                 }
+
+            m_samples_done++;
         }
 
         bool has_block() const { return m_blocks.size() > 0; }
@@ -87,25 +111,7 @@ namespace Oxy::Renderer {
         void render_block(Block block) {
             for (int y = block.start_y; y < block.end_y; y++)
                 for (int x = block.start_x; x < block.end_x; x++) {
-                    auto aspect = (double)m_film.height() / (double)m_film.width();
-
-                    auto tent_x = random<double>(0.0, 1.0);
-                    auto tent_y = random<double>(0.0, 1.0);
-
-                    double real_offset = -0.7463;
-                    double imag_offset = 0.1102;
-                    double radius      = 0.002;
-
-                    auto xf = radius * (((double)x + tent_x) / (double)m_film.width() - 0.5) +
-                              real_offset;
-
-                    auto yf =
-                        radius * aspect * (((double)y + tent_y) / (double)m_film.height() - 0.5) +
-                        imag_offset;
-
-                    // m_camera.set_pos(glm::dvec3(xf, yf, 0));
-                    // auto camray = m_camera.get_ray(x, y, m_film.width(), m_film.height());
-                    CameraRay camray(glm::dvec3(xf, yf, 0), glm::dvec3());
+                    CameraRay camray(glm::dvec3(x, y, 0), glm::dvec3());
                     m_film.splat(x, y, m_integrator->integrate(camray));
                 }
         }
@@ -119,7 +125,10 @@ namespace Oxy::Renderer {
         std::vector<Block> m_blocks;
         std::mutex         m_blocks_mtx;
 
-        bool m_running;
+        bool        m_running;
+        WorkerState m_state;
+
+        int m_samples_done = 0;
 
         std::vector<std::thread> m_workers;
         std::vector<WorkerState> m_worker_state;
