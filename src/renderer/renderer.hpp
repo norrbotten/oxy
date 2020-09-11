@@ -94,7 +94,7 @@ namespace Oxy::Renderer {
 
                     double real_offset = -0.7463;
                     double imag_offset = 0.1102;
-                    double radius      = 0.005;
+                    double radius      = 0.002;
 
                     auto xf = radius * (((double)x + tent_x) / (double)m_film.width() - 0.5) +
                               real_offset;

@@ -14,6 +14,9 @@ namespace Oxy::Renderer {
     void OxyRenderer::start_render(int num_threads) {
         m_running = true;
 
+        for (int i = 0; i < m_worker_state.size(); i++)
+            m_worker_state[i] = WorkerState::Rendering;
+
         if (num_threads > m_workers.size()) {
             for (int i = m_worker_state.size(); i < num_threads; i++) {
                 auto id = m_workers.size();
