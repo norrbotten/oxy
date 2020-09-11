@@ -69,7 +69,7 @@ namespace Oxy::Renderer {
 
         double zx = 0, zy = 0;
 
-        for (int i = 0; i < 128; i++) {
+        for (int i = 0; i < 256; i++) {
             auto temp = zx * zx - zy * zy + cx;
             zy        = 2 * zx * zy + cy;
             zx        = temp;

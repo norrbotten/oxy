@@ -300,7 +300,7 @@ namespace Oxy::Application {
         }
     }
 
-    void App::event_loop_handler(sf::Event& evnt) {}
+    void App::event_loop_handler(sf::Event& evnt) { (void)evnt; }
 
     void App::run() {
         ImGui::SFML::Init(m_window);

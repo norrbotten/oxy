@@ -195,37 +195,58 @@ namespace Oxy::Application {
 
     template <>
     struct ui_event<RenderPreviewEnabledToggled> {
-        void operator()(App& app, bool on) {}
+        void operator()(App& app, bool on) {
+            (void)app;
+            (void)on;
+        }
     };
 
     template <>
     struct ui_event<RenderPreviewModeChanged> {
-        void operator()(App& app, int mode) {}
+        void operator()(App& app, int mode) {
+            (void)app;
+            (void)mode;
+        }
     };
 
     template <>
     struct ui_event<RenderAlgorithmChanged> {
-        void operator()(App& app, int mode) {}
+        void operator()(App& app, int mode) {
+            (void)app;
+            (void)mode;
+        }
     };
 
     template <>
     struct ui_event<RenderMaxSamplesChanged> {
-        void operator()(App& app, int num_samples) {}
+        void operator()(App& app, int num_samples) {
+            (void)app;
+            (void)num_samples;
+        }
     };
 
     template <>
     struct ui_event<RenderContinousSamplingToggled> {
-        void operator()(App& app, bool on) {}
+        void operator()(App& app, bool on) {
+            (void)app;
+            (void)on;
+        }
     };
 
     template <>
     struct ui_event<RaytracerSupersamplingChanged> {
-        void operator()(App& app, int level) {}
+        void operator()(App& app, int level) {
+            (void)app;
+            (void)level;
+        }
     };
 
     template <>
     struct ui_event<PathtracerMethodChanged> {
-        void operator()(App& app, int method) {}
+        void operator()(App& app, int method) {
+            (void)app;
+            (void)method;
+        }
     };
 
     template <>

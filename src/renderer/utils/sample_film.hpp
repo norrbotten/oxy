@@ -38,11 +38,11 @@ namespace Oxy::Renderer {
 
         void clear() {
             if (m_cumulative_buffer != nullptr)
-                for (unsigned int i = 0; i < 3 * m_width * m_height; i++)
+                for (int i = 0; i < 3 * m_width * m_height; i++)
                     m_cumulative_buffer[i] = 0.0;
 
             if (m_sample_count != nullptr)
-                for (unsigned int i = 0; i < m_width * m_height; i++)
+                for (int i = 0; i < m_width * m_height; i++)
                     m_sample_count[i] = 0;
         }
 

@@ -16,6 +16,9 @@ namespace Oxy::Renderer {
     class BVH<Primitives::Triangle> final {
     public:
         bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir, double& t) {
+            (void)origin;
+            (void)dir;
+            (void)t;
             return false;
         }
     };
@@ -24,6 +27,9 @@ namespace Oxy::Renderer {
     class BVH<Primitives::Sphere> final {
     public:
         bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir, double& t) {
+            (void)origin;
+            (void)dir;
+            (void)t;
             return false;
         }
     };

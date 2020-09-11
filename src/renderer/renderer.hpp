@@ -54,7 +54,7 @@ namespace Oxy::Renderer {
             m_film.clear();
         }
 
-        void start_render(int num_threads = 24);
+        void start_render(unsigned int num_threads = 24);
         void pause_render();
         void reset_render();
 
@@ -65,7 +65,7 @@ namespace Oxy::Renderer {
 
         const auto running() const { return m_running; }
 
-        const WorkerState worker_state(int id) const { return m_worker_state[id]; }
+        WorkerState worker_state(int id) const { return m_worker_state[id]; }
 
         const char* state_str() const {
             switch (m_state) {

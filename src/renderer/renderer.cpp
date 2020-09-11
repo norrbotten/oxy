@@ -12,15 +12,15 @@ namespace Oxy::Renderer {
             delete m_integrator;
     }
 
-    void OxyRenderer::start_render(int num_threads) {
+    void OxyRenderer::start_render(unsigned int num_threads) {
         m_running = true;
         m_state   = WorkerState::Rendering;
 
-        for (int i = 0; i < m_worker_state.size(); i++)
+        for (unsigned int i = 0; i < m_worker_state.size(); i++)
             m_worker_state[i] = WorkerState::Rendering;
 
         if (num_threads > m_workers.size()) {
-            for (int i = m_worker_state.size(); i < num_threads; i++) {
+            for (unsigned int i = m_worker_state.size(); i < num_threads; i++) {
                 auto id = m_workers.size();
 
                 m_worker_state.push_back(WorkerState::Rendering);
@@ -52,7 +52,7 @@ namespace Oxy::Renderer {
         m_running = false;
         m_state   = WorkerState::Paused;
 
-        for (int i = 0; i < m_worker_state.size(); i++)
+        for (unsigned int i = 0; i < m_worker_state.size(); i++)
             m_worker_state[i] = WorkerState::Paused;
     }
 
@@ -60,7 +60,7 @@ namespace Oxy::Renderer {
         m_running = false;
         m_state   = WorkerState::Stopped;
 
-        for (int i = 0; i < m_worker_state.size(); i++)
+        for (unsigned int i = 0; i < m_worker_state.size(); i++)
             m_worker_state[i] = WorkerState::Stopped;
 
         for (auto& thread : m_workers)
