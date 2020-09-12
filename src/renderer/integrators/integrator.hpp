@@ -25,7 +25,7 @@ namespace Oxy::Renderer {
 
         auto& accel() { return m_accel; }
 
-        virtual Color integrate(const CameraRay& camray) const = 0;
+        virtual Color integrate(CameraRay camray) const = 0;
 
         void set_resolution(int width, int height) {
             m_width  = width;
@@ -45,7 +45,7 @@ namespace Oxy::Renderer {
 
         virtual ~FractalIntegrator() override {}
 
-        virtual Color integrate(const CameraRay& camray) const override;
+        virtual Color integrate(CameraRay camray) const override;
     };
 
     class BuddhabrotIntegrator final : public Integrator {
@@ -55,7 +55,7 @@ namespace Oxy::Renderer {
 
         virtual ~BuddhabrotIntegrator() override {}
 
-        virtual Color integrate(const CameraRay& camray) const override;
+        virtual Color integrate(CameraRay camray) const override;
     };
 
 } // namespace Oxy::Renderer

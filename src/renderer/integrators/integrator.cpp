@@ -2,7 +2,7 @@
 
 namespace Oxy::Renderer {
 
-    Color FractalIntegrator::integrate(const CameraRay& camray) const {
+    Color FractalIntegrator::integrate(CameraRay camray) const {
         auto fractal = [](double cx, double cy) -> double {
             double zx = 0, zy = 0;
 
@@ -44,7 +44,7 @@ namespace Oxy::Renderer {
         return col;
     }
 
-    Color BuddhabrotIntegrator::integrate(const CameraRay& camray) const {
+    Color BuddhabrotIntegrator::integrate(CameraRay camray) const {
         double real_offset = -0.35;
         double imag_offset = 0;
         double radius      = 3;

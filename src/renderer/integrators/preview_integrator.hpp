@@ -9,7 +9,7 @@ namespace Oxy::Renderer {
         PreviewIntegrator(int width, int height, SampleFilm& film);
         virtual ~PreviewIntegrator() override;
 
-        virtual Color integrate(const CameraRay& camray) const override;
+        virtual Color integrate(CameraRay camray) const override;
 
     private:
     };

@@ -7,7 +7,7 @@ namespace Oxy::Renderer {
 
     PreviewIntegrator::~PreviewIntegrator() {}
 
-    Color PreviewIntegrator::integrate(const CameraRay& camray) const {
+    Color PreviewIntegrator::integrate(CameraRay camray) const {
         IntersectionResult res;
 
         if (m_accel.intersect_ray(camray.origin, camray.dir, res)) {
