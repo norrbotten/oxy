@@ -12,6 +12,41 @@ namespace Oxy::Renderer {
             delete m_integrator;
     }
 
+    void OxyRenderer::set_render_resolution(int width, int height) {
+        if (m_integrator != nullptr)
+            m_integrator->set_resolution(width, height);
+
+        m_film.resize(width, height);
+    }
+
+    void OxyRenderer::select_integrator(Integrators integrator) {
+        if (m_integrator != nullptr)
+            delete m_integrator;
+
+        switch (integrator) {
+        case Integrators::Fractal:
+            m_integrator = new FractalIntegrator(m_film.width(), m_film.height(), m_film);
+            break;
+
+        case Integrators::Buddhabrot:
+            m_integrator = new BuddhabrotIntegrator(m_film.width(), m_film.height(), m_film);
+            break;
+
+        case Integrators::Preview:
+            m_integrator = new PreviewIntegrator(m_film.width(), m_film.height(), m_film);
+            break;
+        }
+
+        std::vector<Triangle> triangles;
+
+        triangles.push_back(
+            Triangle(glm::dvec3(0, -1, -1), glm::dvec3(0, 1, -1), glm::dvec3(0, 0, 1)));
+
+        m_integrator->accel().triangle_bvh().build(triangles);
+
+        m_film.clear();
+    }
+
     void OxyRenderer::start_render(unsigned int num_threads) {
         m_running = true;
         m_state   = WorkerState::Rendering;
@@ -74,6 +109,30 @@ namespace Oxy::Renderer {
 
         m_blocks.clear();
         m_samples_done = 0;
+    }
+
+    const char* OxyRenderer::state_str() const {
+        switch (m_state) {
+        case WorkerState::Rendering: return "Running";
+        case WorkerState::Paused: return "Paused";
+        case WorkerState::Stopped: return "Stopped";
+        }
+
+        return "";
+    }
+
+    void OxyRenderer::generate_blocks() {
+        std::lock_guard g(m_blocks_mtx);
+
+        m_blocks.clear();
+
+        for (int y = 0; y < m_film.height(); y += 32)
+            for (int x = 0; x < m_film.width(); x += 32) {
+                m_blocks.push_back(Block{x, y, std::min(m_film.width(), x + 32),
+                                         std::min(m_film.height(), y + 32)});
+            }
+
+        m_samples_done++;
     }
 
 } // namespace Oxy::Renderer

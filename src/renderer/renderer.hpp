@@ -32,81 +32,27 @@ namespace Oxy::Renderer {
         auto get_render_width() const { return m_film.width(); }
         auto get_render_height() const { return m_film.height(); }
 
-        void set_render_resolution(int width, int height) {
-            if (m_integrator != nullptr)
-                m_integrator->set_resolution(width, height);
+        void set_render_resolution(int width, int height);
 
-            m_film.resize(width, height);
-        }
-
-        void select_integrator(Integrators integrator) {
-            if (m_integrator != nullptr)
-                delete m_integrator;
-
-            switch (integrator) {
-            case Integrators::Fractal:
-                m_integrator = new FractalIntegrator(m_film.width(), m_film.height(), m_film);
-                break;
-
-            case Integrators::Buddhabrot:
-                m_integrator = new BuddhabrotIntegrator(m_film.width(), m_film.height(), m_film);
-                break;
-
-            case Integrators::Preview:
-                m_integrator = new PreviewIntegrator(m_film.width(), m_film.height(), m_film);
-                break;
-            }
-
-            std::vector<Triangle> triangles;
-
-            triangles.push_back(
-                Triangle(glm::dvec3(0, -1, -1), glm::dvec3(0, 1, -1), glm::dvec3(0, 0, 1)));
-
-            m_integrator->accel().triangle_bvh().build(triangles);
-
-            m_film.clear();
-        }
+        void select_integrator(Integrators integrator);
 
         void start_render(unsigned int num_threads = 24);
         void pause_render();
         void reset_render();
+
+        void generate_blocks();
+        bool has_block() const { return m_blocks.size() > 0; }
 
         const auto& film() const { return m_film; }
         const auto& blocks() const { return m_blocks; }
 
         auto& camera() { return m_camera; }
 
-        const auto running() const { return m_running; }
+        const char* state_str() const;
+        const auto  running() const { return m_running; }
+        const auto  samples_done() const { return m_samples_done - 1; }
 
         WorkerState worker_state(int id) const { return m_worker_state[id]; }
-
-        const char* state_str() const {
-            switch (m_state) {
-            case WorkerState::Rendering: return "Running";
-            case WorkerState::Paused: return "Paused";
-            case WorkerState::Stopped: return "Stopped";
-            }
-
-            return "";
-        }
-
-        const auto samples_done() const { return m_samples_done - 1; }
-
-        void generate_blocks() {
-            std::lock_guard g(m_blocks_mtx);
-
-            m_blocks.clear();
-
-            for (int y = 0; y < m_film.height(); y += 32)
-                for (int x = 0; x < m_film.width(); x += 32) {
-                    m_blocks.push_back(Block{x, y, std::min(m_film.width(), x + 32),
-                                             std::min(m_film.height(), y + 32)});
-                }
-
-            m_samples_done++;
-        }
-
-        bool has_block() const { return m_blocks.size() > 0; }
 
     private:
         std::optional<Block> aquire_block() {
