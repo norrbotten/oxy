@@ -1,6 +1,6 @@
 #include "renderer/renderer.hpp"
 
-#include <iostream>
+#include "renderer/parsers/stl.hpp"
 
 namespace Oxy::Renderer {
 
@@ -41,8 +41,9 @@ namespace Oxy::Renderer {
 
         std::vector<Triangle> triangles;
 
-        triangles.push_back(
-            Triangle(glm::dvec3(0, -2, -1), glm::dvec3(0, 2, -1), glm::dvec3(0, 0, 1)));
+        if (auto err = Parsers::parse_stl("./uwu.stl", triangles); err.has_value()) {
+            std::cout << err.value() << "\n";
+        }
 
         m_integrator->accel().triangle_bvh().build(triangles);
 

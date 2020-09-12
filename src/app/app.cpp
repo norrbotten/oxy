@@ -306,10 +306,10 @@ namespace Oxy::Application {
         ImGui::SFML::Init(m_window);
 
         m_renderer.select_integrator(Renderer::Integrators::Preview);
-        resize_render_preview(1024, 1024);
+        resize_render_preview(512, 512);
 
-        m_renderer.camera().set_pos(glm::dvec3(-3, 0, 0));
-        m_renderer.camera().aim(glm::dvec3(0, 0, 0));
+        m_renderer.camera().set_pos(glm::dvec3(-0.7, -0.2, 0.15));
+        m_renderer.camera().aim(glm::dvec3(0, -0.08, 0.05));
 
         ui_event<Initialize>{}(*this);
 
