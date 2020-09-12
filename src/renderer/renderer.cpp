@@ -1,5 +1,7 @@
 #include "renderer/renderer.hpp"
 
+#include <iostream>
+
 namespace Oxy::Renderer {
 
     OxyRenderer::OxyRenderer()
@@ -40,7 +42,7 @@ namespace Oxy::Renderer {
         std::vector<Triangle> triangles;
 
         triangles.push_back(
-            Triangle(glm::dvec3(0, -1, -1), glm::dvec3(0, 1, -1), glm::dvec3(0, 0, 1)));
+            Triangle(glm::dvec3(0, -2, -1), glm::dvec3(0, 2, -1), glm::dvec3(0, 0, 1)));
 
         m_integrator->accel().triangle_bvh().build(triangles);
 

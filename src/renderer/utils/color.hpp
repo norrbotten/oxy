@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <glm/glm.hpp>
+
 namespace Oxy::Renderer {
 
     class Color final {
@@ -26,6 +28,8 @@ namespace Oxy::Renderer {
             g = convert(m_g);
             b = convert(m_b);
         }
+
+        static Color from_normal(const glm::dvec3& normal);
 
     private:
         double m_r, m_g, m_b;

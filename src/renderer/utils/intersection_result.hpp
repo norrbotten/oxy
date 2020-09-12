@@ -5,8 +5,8 @@
 namespace Oxy::Renderer {
 
     struct IntersectionResult {
-        bool   hit;
-        double t;
+        bool   hit = false;
+        double t   = std::numeric_limits<double>::max();
 
         glm::dvec3 hitpos;
         glm::dvec3 hitnormal;

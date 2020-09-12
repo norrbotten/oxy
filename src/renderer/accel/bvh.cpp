@@ -126,6 +126,7 @@ namespace Oxy::Renderer {
                         res.t   = val;
                         res.hit = true;
 
+                        res.hitpos    = origin + dir * res.t;
                         res.hitnormal = glm::dvec3(avx2_extract(packed_tris.normal[0], n),
                                                    avx2_extract(packed_tris.normal[1], n),
                                                    avx2_extract(packed_tris.normal[2], n));
@@ -134,13 +135,7 @@ namespace Oxy::Renderer {
             }
         }
 
-        if (res.hit) {
-            res.hitpos = origin + dir * res.t;
-
-            return true;
-        }
-
-        return false;
+        return res.hit;
     }
 
     void BVH<Primitives::Sphere>::build(const std::vector<Sphere>& spheres) {}

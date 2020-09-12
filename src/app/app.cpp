@@ -308,7 +308,7 @@ namespace Oxy::Application {
         m_renderer.select_integrator(Renderer::Integrators::Preview);
         resize_render_preview(1024, 1024);
 
-        m_renderer.camera().set_pos(glm::dvec3(-5, 0, 0));
+        m_renderer.camera().set_pos(glm::dvec3(-3, 0, 0));
         m_renderer.camera().aim(glm::dvec3(0, 0, 0));
 
         ui_event<Initialize>{}(*this);

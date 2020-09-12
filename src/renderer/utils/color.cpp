@@ -34,4 +34,8 @@ namespace Oxy::Renderer {
         return *this;
     }
 
+    Color Color::from_normal(const glm::dvec3& normal) {
+        return Color(normal.x * 0.5 + 0.5, normal.y * 0.5 + 0.5, normal.z * 0.5 + 0.5);
+    }
+
 } // namespace Oxy::Renderer

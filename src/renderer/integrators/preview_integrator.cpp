@@ -11,7 +11,8 @@ namespace Oxy::Renderer {
         IntersectionResult res;
 
         if (m_accel.intersect_ray(camray.origin, camray.dir, res)) {
-            return Color(glm::dot(camray.dir, -res.hitnormal));
+            // return Color::from_normal(res.hitnormal);
+            return Color(glm::abs(glm::dot(camray.dir, res.hitnormal)));
         }
 
         return Color();
