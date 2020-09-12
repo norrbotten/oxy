@@ -5,14 +5,17 @@ namespace Oxy::Renderer {
     bool Accelerator::intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
                                     IntersectionResult& res) {
 
-        double triangle_res = std::numeric_limits<double>::max();
-        double sphere_res   = std::numeric_limits<double>::max();
+        IntersectionResult triangle_res;
+        IntersectionResult sphere_res;
+
+        triangle_res.t = std::numeric_limits<double>::max();
+        sphere_res.t   = std::numeric_limits<double>::max();
 
         if (m_triangle_bvh.intersect_ray(origin, dir, triangle_res) ||
             m_sphere_bvh.intersect_ray(origin, dir, sphere_res)) {
 
             res.hit    = true;
-            res.t      = std::min(triangle_res, sphere_res);
+            res.t      = std::min(triangle_res.t, sphere_res.t);
             res.hitpos = origin + dir * res.t;
 
             return true;

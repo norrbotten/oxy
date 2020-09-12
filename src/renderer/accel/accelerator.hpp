@@ -6,16 +6,9 @@
 
 #include "renderer/accel/bvh.hpp"
 #include "renderer/utils/camera.hpp"
+#include "renderer/utils/intersection_result.hpp"
 
 namespace Oxy::Renderer {
-
-    struct IntersectionResult {
-        bool   hit;
-        double t;
-
-        glm::dvec3 hitpos;
-        glm::dvec3 hitnormal;
-    };
 
     class Accelerator final {
     public:

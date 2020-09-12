@@ -19,6 +19,15 @@ namespace Oxy::Renderer {
     template <>
     class Primitive<Primitives::Triangle> final {
     public:
+        Primitive(glm::dvec3 p0, glm::dvec3 p1, glm::dvec3 p2)
+            : m_p0(p0)
+            , m_p1(p1)
+            , m_p2(p2) {
+
+            compute_normal();
+            compute_bbox();
+        }
+
         Primitive(const glm::dvec3& p0, const glm::dvec3& p1, const glm::dvec3& p2)
             : m_p0(p0)
             , m_p1(p1)
@@ -33,7 +42,7 @@ namespace Oxy::Renderer {
         const auto& p2() const { return m_p2; }
         const auto& normal() const { return m_normal; }
 
-        std::pair<glm::dvec3, glm::dvec3> get_bbox() const { return {m_box_min, m_box_max}; }
+        std::pair<glm::dvec3, glm::dvec3> bbox() const { return {m_box_min, m_box_max}; }
 
     private:
         inline void compute_normal() {
@@ -65,13 +74,26 @@ namespace Oxy::Renderer {
     template <>
     class Primitive<Primitives::Sphere> final {
     public:
+        Primitive(glm::dvec3 center, double radius)
+            : m_center(center)
+            , m_radius(radius) {}
+
         Primitive(const glm::dvec3& center, double radius)
             : m_center(center)
             , m_radius(radius) {}
+
+        const auto normal(glm::dvec3 point) { return (point - m_center) / m_radius; }
+
+        std::pair<glm::dvec3, glm::dvec3> bbox() const {
+            return {m_center - glm::dvec3(m_radius), m_center + glm::dvec3(m_radius)};
+        }
 
     private:
         glm::dvec3 m_center;
         double     m_radius;
     };
+
+    using Triangle = Primitive<Primitives::Triangle>;
+    using Sphere   = Primitive<Primitives::Sphere>;
 
 } // namespace Oxy::Renderer

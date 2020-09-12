@@ -23,27 +23,27 @@ namespace Oxy::Renderer {
             for (unsigned int i = m_worker_state.size(); i < num_threads; i++) {
                 auto id = m_workers.size();
 
-                m_worker_state.push_back(WorkerState::Rendering);
-                m_workers.push_back(std::thread(
-                    [&](int id) {
-                        while (true) {
-                            auto state = this->worker_state(id);
-                            if (state == WorkerState::Stopped)
-                                break;
+                auto worker_func = [&](int id) -> void {
+                    while (true) {
+                        auto state = this->worker_state(id);
+                        if (state == WorkerState::Stopped)
+                            break;
 
-                            if (state == WorkerState::Rendering)
-                                if (auto block = this->aquire_block(); block.has_value())
-                                    this->render_block(block.value());
+                        if (state == WorkerState::Rendering)
+                            if (auto block = this->aquire_block(); block.has_value())
+                                this->render_block(block.value());
 
-                            if (state == WorkerState::Paused) {
-                                using namespace std::chrono_literals;
-                                std::this_thread::sleep_for(10ms);
-                            }
-                            else
-                                std::this_thread::yield();
+                        if (state == WorkerState::Paused) {
+                            using namespace std::chrono_literals;
+                            std::this_thread::sleep_for(10ms);
                         }
-                    },
-                    id));
+                        else
+                            std::this_thread::yield();
+                    }
+                };
+
+                m_worker_state.push_back(WorkerState::Rendering);
+                m_workers.push_back(std::thread(worker_func, id));
             }
         }
     }
