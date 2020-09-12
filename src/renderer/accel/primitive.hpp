@@ -28,15 +28,6 @@ namespace Oxy::Renderer {
             compute_bbox();
         }
 
-        Primitive(const glm::dvec3& p0, const glm::dvec3& p1, const glm::dvec3& p2)
-            : m_p0(p0)
-            , m_p1(p1)
-            , m_p2(p2) {
-
-            compute_normal();
-            compute_bbox();
-        }
-
         const auto& p0() const { return m_p0; }
         const auto& p1() const { return m_p1; }
         const auto& p2() const { return m_p2; }
@@ -75,10 +66,6 @@ namespace Oxy::Renderer {
     class Primitive<Primitives::Sphere> final {
     public:
         Primitive(glm::dvec3 center, double radius)
-            : m_center(center)
-            , m_radius(radius) {}
-
-        Primitive(const glm::dvec3& center, double radius)
             : m_center(center)
             , m_radius(radius) {}
 

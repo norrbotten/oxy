@@ -7,6 +7,11 @@ namespace Oxy::Renderer {
         , m_g(0)
         , m_b(0) {}
 
+    Color::Color(double a)
+        : m_r(a)
+        , m_g(a)
+        , m_b(a) {}
+
     Color::Color(double r, double g, double b)
         : m_r(r)
         , m_g(g)

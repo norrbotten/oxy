@@ -54,7 +54,7 @@ namespace Oxy::Renderer {
     }
 
     bool BVH<Primitives::Triangle>::intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                                                  IntersectionResult& res) {
+                                                  IntersectionResult& res) const {
 
         packed_ray p_ray;
 
@@ -146,7 +146,7 @@ namespace Oxy::Renderer {
     void BVH<Primitives::Sphere>::build(const std::vector<Sphere>& spheres) {}
 
     bool BVH<Primitives::Sphere>::intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                                                IntersectionResult& res) {
+                                                IntersectionResult& res) const {
 
         (void)origin;
         (void)dir;

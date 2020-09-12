@@ -305,10 +305,10 @@ namespace Oxy::Application {
     void App::run() {
         ImGui::SFML::Init(m_window);
 
-        m_renderer.select_integrator(Renderer::Integrators::Buddhabrot);
+        m_renderer.select_integrator(Renderer::Integrators::Preview);
         resize_render_preview(1024, 1024);
 
-        m_renderer.camera().set_pos(glm::dvec3(0, 0, -5));
+        m_renderer.camera().set_pos(glm::dvec3(-5, 0, 0));
         m_renderer.camera().aim(glm::dvec3(0, 0, 0));
 
         ui_event<Initialize>{}(*this);

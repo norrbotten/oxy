@@ -3,7 +3,7 @@
 namespace Oxy::Renderer {
 
     bool Accelerator::intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                                    IntersectionResult& res) {
+                                    IntersectionResult& res) const {
 
         IntersectionResult triangle_res;
         IntersectionResult sphere_res;
@@ -25,7 +25,7 @@ namespace Oxy::Renderer {
     }
 
     bool Accelerator::intersect_line(const glm::dvec3& start, const glm::dvec3& end,
-                                     IntersectionResult& res) {
+                                     IntersectionResult& res) const {
 
         auto dir = end - start;
         auto len = glm::length(dir);

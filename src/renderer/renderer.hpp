@@ -7,6 +7,8 @@
 #include <vector>
 
 #include "renderer/integrators/integrator.hpp"
+#include "renderer/integrators/preview_integrator.hpp"
+
 #include "renderer/utils/sample_film.hpp"
 
 namespace Oxy::Renderer {
@@ -49,7 +51,18 @@ namespace Oxy::Renderer {
             case Integrators::Buddhabrot:
                 m_integrator = new BuddhabrotIntegrator(m_film.width(), m_film.height(), m_film);
                 break;
+
+            case Integrators::Preview:
+                m_integrator = new PreviewIntegrator(m_film.width(), m_film.height(), m_film);
+                break;
             }
+
+            std::vector<Triangle> triangles;
+
+            triangles.push_back(
+                Triangle(glm::dvec3(0, -1, -1), glm::dvec3(0, 1, -1), glm::dvec3(0, 0, 1)));
+
+            m_integrator->accel().triangle_bvh().build(triangles);
 
             m_film.clear();
         }
@@ -111,7 +124,7 @@ namespace Oxy::Renderer {
         void render_block(Block block) {
             for (int y = block.start_y; y < block.end_y; y++)
                 for (int x = block.start_x; x < block.end_x; x++) {
-                    CameraRay camray(glm::dvec3(x, y, 0), glm::dvec3());
+                    auto camray = m_camera.get_ray(x, y, m_film.width(), m_film.height());
                     m_film.splat(x, y, m_integrator->integrate(camray));
                 }
         }

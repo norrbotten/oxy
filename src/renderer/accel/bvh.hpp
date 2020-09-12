@@ -62,7 +62,7 @@ namespace Oxy::Renderer {
     class BVH final {
     public:
         bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                           IntersectionResult& res);
+                           IntersectionResult& res) const;
 
         void build(const std::vector<Primitive<T>>& primitives);
     };
@@ -71,7 +71,7 @@ namespace Oxy::Renderer {
     class BVH<Primitives::Triangle> final {
     public:
         bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                           IntersectionResult& res);
+                           IntersectionResult& res) const;
 
         void build(const std::vector<Triangle>& triangles);
 
@@ -83,7 +83,7 @@ namespace Oxy::Renderer {
     class BVH<Primitives::Sphere> final {
     public:
         bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                           IntersectionResult& res);
+                           IntersectionResult& res) const;
 
         void build(const std::vector<Sphere>& spheres);
     };

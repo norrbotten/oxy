@@ -7,6 +7,7 @@ namespace Oxy::Renderer {
     class Color final {
     public:
         Color();
+        Color(double a);
         Color(double r, double g, double b);
 
         const auto& r() const { return m_r; }
