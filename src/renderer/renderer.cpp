@@ -44,6 +44,9 @@ namespace Oxy::Renderer {
         if (auto err = Parsers::parse_stl("./uwu.stl", triangles); err.has_value()) {
             std::cout << err.value() << "\n";
         }
+        else {
+            std::cout << triangles.size() << " triangles\n";
+        }
 
         m_integrator->accel().triangle_bvh().build(triangles);
 

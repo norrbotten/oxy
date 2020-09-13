@@ -138,7 +138,7 @@ namespace Oxy::Renderer {
         return res.hit;
     }
 
-    void BVH<Primitives::Sphere>::build(const std::vector<Sphere>& spheres) {}
+    void BVH<Primitives::Sphere>::build(const std::vector<Sphere>& spheres) { (void)spheres; }
 
     bool BVH<Primitives::Sphere>::intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
                                                 IntersectionResult& res) const {
