@@ -15,7 +15,7 @@ workspace "bigbong"
         symbols "Off"
         optimize "Full"
         buildoptions { "-Werror", "-Wextra", "-Wall", "-Wpedantic" }
-    
+
     filter { }
 
 function include_sfml()
@@ -52,5 +52,13 @@ newaction {
     description = "debug",
     execute = function()
         os.execute("(premake5 gmake2 && cd build && make -j) && gdb -ex run ./build/bin/debug/bigbong")
+    end
+}
+
+newaction {
+    trigger = "run",
+    description = "run",
+    execute = function()
+        os.execute("(premake5 gmake2 && cd build && make -j config=release) && ./build/bin/release/bigbong")
     end
 }

@@ -294,7 +294,7 @@ namespace Oxy::Application {
         m_window.display();
 
         if (!m_renderer.has_block()) {
-            m_renderer.generate_blocks();
+            m_renderer.next_sample();
             m_renderer.film().copy_to_rgba_buffer(m_preview_layer.get_mutable_buffer(),
                                                   im_render_data.exposure);
         }

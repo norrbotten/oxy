@@ -40,7 +40,11 @@ namespace Oxy::Renderer {
         void pause_render();
         void reset_render();
 
-        void generate_blocks();
+        void sample_continously(bool on) { m_continous_sampling = on; }
+
+        void set_max_samples(int num_samples) { m_samples_to_do = num_samples; }
+
+        void next_sample();
         bool has_block() const { return m_blocks.size() > 0; }
 
         const auto& film() const { return m_film; }
@@ -87,7 +91,9 @@ namespace Oxy::Renderer {
         bool        m_running;
         WorkerState m_state;
 
-        int m_samples_done = 0;
+        int  m_samples_done       = 0;
+        int  m_samples_to_do      = 1;
+        bool m_continous_sampling = false;
 
         std::vector<std::thread> m_workers;
         std::vector<WorkerState> m_worker_state;

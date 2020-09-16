@@ -123,11 +123,16 @@ namespace Oxy::Renderer {
         case WorkerState::Paused: return "Paused";
         case WorkerState::Stopped: return "Stopped";
         }
-
         return "";
     }
 
-    void OxyRenderer::generate_blocks() {
+    void OxyRenderer::next_sample() {
+        if (has_block())
+            return;
+
+        if (!m_continous_sampling && m_samples_done >= m_samples_to_do)
+            pause_render();
+
         std::lock_guard g(m_blocks_mtx);
 
         m_blocks.clear();

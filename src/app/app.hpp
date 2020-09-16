@@ -57,7 +57,7 @@ namespace Oxy::Application {
         int         rendering_mode          = 0;
 
         bool continous_sampling = true;
-        int  max_samples        = 64;
+        int  max_samples        = 32;
 
         float exposure = 1;
     };
@@ -98,11 +98,7 @@ namespace Oxy::Application {
             m_renderer.set_render_resolution(width, height);
         }
 
-        void start_render() { m_renderer.start_render(); }
-
-        void pause_render() { m_renderer.pause_render(); }
-
-        void reset_render() { m_renderer.reset_render(); }
+        auto& renderer() { return m_renderer; }
 
         ImmediateData_Window             im_window_data;
         ImmediateData_RenderSettings     im_render_data;
@@ -121,22 +117,6 @@ namespace Oxy::Application {
     template <UIEvent evnt, typename... Args>
     struct ui_event {
         void operator()(App& app, Args... args);
-    };
-
-    template <>
-    struct ui_event<Initialize> {
-        void operator()(App& app) {
-            app.im_window_data.window_width  = app.window_size().x;
-            app.im_window_data.window_height = app.window_size().y;
-
-            app.im_window_data.render_width  = app.render_preview_resolution().x;
-            app.im_window_data.render_height = app.render_preview_resolution().y;
-
-            snprintf(app.im_window_data.input_render_width, 16, "%i",
-                     app.im_window_data.render_width);
-            snprintf(app.im_window_data.input_render_height, 16, "%i",
-                     app.im_window_data.render_height);
-        }
     };
 
     template <>
@@ -219,18 +199,12 @@ namespace Oxy::Application {
 
     template <>
     struct ui_event<RenderMaxSamplesChanged> {
-        void operator()(App& app, int num_samples) {
-            (void)app;
-            (void)num_samples;
-        }
+        void operator()(App& app, int num_samples) { app.renderer().set_max_samples(num_samples); }
     };
 
     template <>
     struct ui_event<RenderContinousSamplingToggled> {
-        void operator()(App& app, bool on) {
-            (void)app;
-            (void)on;
-        }
+        void operator()(App& app, bool on) { app.renderer().sample_continously(on); }
     };
 
     template <>
@@ -251,17 +225,36 @@ namespace Oxy::Application {
 
     template <>
     struct ui_event<RenderControlStart> {
-        void operator()(App& app) { app.start_render(); }
+        void operator()(App& app) { app.renderer().start_render(); }
     };
 
     template <>
     struct ui_event<RenderControlPause> {
-        void operator()(App& app) { app.pause_render(); }
+        void operator()(App& app) { app.renderer().pause_render(); }
     };
 
     template <>
     struct ui_event<RenderControlReset> {
-        void operator()(App& app) { app.reset_render(); }
+        void operator()(App& app) { app.renderer().reset_render(); }
+    };
+
+    template <>
+    struct ui_event<Initialize> {
+        void operator()(App& app) {
+            app.im_window_data.window_width  = app.window_size().x;
+            app.im_window_data.window_height = app.window_size().y;
+
+            app.im_window_data.render_width  = app.render_preview_resolution().x;
+            app.im_window_data.render_height = app.render_preview_resolution().y;
+
+            snprintf(app.im_window_data.input_render_width, 16, "%i",
+                     app.im_window_data.render_width);
+            snprintf(app.im_window_data.input_render_height, 16, "%i",
+                     app.im_window_data.render_height);
+
+            ui_event<RenderMaxSamplesChanged>{}(app, app.im_render_data.max_samples);
+            ui_event<RenderContinousSamplingToggled>{}(app, app.im_render_data.continous_sampling);
+        }
     };
 
 } // namespace Oxy::Application
