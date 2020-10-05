@@ -54,6 +54,9 @@ namespace Oxy::Renderer {
     }
 
     void OxyRenderer::start_render(unsigned int num_threads) {
+        if (m_samples_done >= m_samples_to_do)
+            return;
+
         m_running = true;
         m_state   = WorkerState::Rendering;
 

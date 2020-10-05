@@ -51,7 +51,7 @@ newaction {
     trigger = "debug",
     description = "debug",
     execute = function()
-        os.execute("(premake5 gmake2 && cd build && make -j) && gdb -ex run ./build/bin/debug/bigbong")
+        os.execute("(premake5 gmake2 && cd build && make -j) && gdb ./build/bin/debug/bigbong")
     end
 }
 

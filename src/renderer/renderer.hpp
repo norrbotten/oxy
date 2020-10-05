@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <iostream>
 #include <mutex>
 #include <optional>
@@ -41,8 +42,12 @@ namespace Oxy::Renderer {
         void reset_render();
 
         void sample_continously(bool on) { m_continous_sampling = on; }
-
         void set_max_samples(int num_samples) { m_samples_to_do = num_samples; }
+
+        const auto samples_done() const { return m_samples_done - 1; }
+
+        float last_sample_time() const;
+        float avg_sample_time() const;
 
         void next_sample();
         bool has_block() const { return m_blocks.size() > 0; }
@@ -54,7 +59,6 @@ namespace Oxy::Renderer {
 
         const char* state_str() const;
         const auto  running() const { return m_running; }
-        const auto  samples_done() const { return m_samples_done - 1; }
 
         WorkerState worker_state(int id) const { return m_worker_state[id]; }
 
@@ -87,6 +91,9 @@ namespace Oxy::Renderer {
 
         std::vector<Block> m_blocks;
         std::mutex         m_blocks_mtx;
+
+        std::chrono::duration<double> m_last_sample_time;
+        std::chrono::duration<double> m_avg_sample_time;
 
         bool        m_running;
         WorkerState m_state;

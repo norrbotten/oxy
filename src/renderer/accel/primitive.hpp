@@ -26,14 +26,20 @@ namespace Oxy::Renderer {
 
             compute_normal();
             compute_bbox();
+            compute_midpoint();
         }
 
         const auto& p0() const { return m_p0; }
         const auto& p1() const { return m_p1; }
         const auto& p2() const { return m_p2; }
-        const auto& normal() const { return m_normal; }
+
+        const auto normal() const { return m_normal; }
+
+        const auto& midpoint() const { return m_midpoint; }
 
         std::pair<glm::dvec3, glm::dvec3> bbox() const { return {m_box_min, m_box_max}; }
+
+        bool intersect_ray(const glm::dvec3& orig, const glm::dvec3& dir, double& t) const;
 
     private:
         inline void compute_normal() {
@@ -55,11 +61,14 @@ namespace Oxy::Renderer {
             m_box_max = {max_x, max_y, max_z};
         }
 
+        inline void compute_midpoint() { m_midpoint = (m_p0 + m_p1 + m_p2) / 3.0; }
+
     private:
         glm::dvec3 m_p0, m_p1, m_p2;
         glm::dvec3 m_normal;
 
         glm::dvec3 m_box_min, m_box_max;
+        glm::dvec3 m_midpoint;
     };
 
     template <>
@@ -70,6 +79,8 @@ namespace Oxy::Renderer {
             , m_radius(radius) {}
 
         const auto normal(glm::dvec3 point) { return (point - m_center) / m_radius; }
+
+        const auto& midpoint() const { return m_center; }
 
         std::pair<glm::dvec3, glm::dvec3> bbox() const {
             return {m_center - glm::dvec3(m_radius), m_center + glm::dvec3(m_radius)};
