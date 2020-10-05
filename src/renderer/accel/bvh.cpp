@@ -9,6 +9,9 @@ namespace Oxy::Renderer {
     void BVH<Primitives::Triangle>::build(const std::vector<Triangle>& triangles) {
         m_triangles = triangles;
         m_bvh       = build_bvh<Triangle>(m_triangles, 0, m_triangles.size());
+
+        int bvh_buffer_size = (1 << ((int)std::log2(m_triangles.size()) + 1)) - 1;
+        std::cout << bvh_buffer_size << "\n";
     }
 
     bool BVH<Primitives::Triangle>::intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
@@ -17,16 +20,13 @@ namespace Oxy::Renderer {
         IntersectionResult tmp_res;
         glm::dvec3         hitnormal;
 
-        UnoptimizedBVHNode<Triangle>* stack[2048] = {0};
-        int                           stack_ptr   = 0;
+        thread_local UnoptimizedBVHNode<Triangle>* stack[2048] = {0};
+        int                                        stack_ptr   = 0;
 
         stack[stack_ptr++] = m_bvh;
 
         while (stack_ptr != 0) {
-            assert(stack_ptr <= 2048);
-
             auto node = stack[--stack_ptr];
-            assert(node != nullptr);
 
             double dummy;
             if (ray_vs_aabb(origin, dir, node->bbox_min, node->bbox_max, dummy)) {

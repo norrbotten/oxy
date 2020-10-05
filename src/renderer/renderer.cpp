@@ -41,7 +41,7 @@ namespace Oxy::Renderer {
 
         std::vector<Triangle> triangles;
 
-        if (auto err = Parsers::parse_stl("./uwu.stl", triangles); err.has_value()) {
+        if (auto err = Parsers::parse_stl("./bunny.stl", triangles); err.has_value()) {
             std::cout << err.value() << "\n";
         }
         else {

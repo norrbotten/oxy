@@ -50,12 +50,12 @@ namespace Oxy::Renderer {
         glm::dvec3 bbox_min;
         glm::dvec3 bbox_max;
 
-        UnoptimizedBVHNode<T>* right_node;
         UnoptimizedBVHNode<T>* left_node;
+        UnoptimizedBVHNode<T>* right_node;
 
         ~UnoptimizedBVHNode() {
-            delete right_node;
             delete left_node;
+            delete right_node;
         }
     };
 
@@ -84,14 +84,11 @@ namespace Oxy::Renderer {
 
         assert(right_index > left_index);
 
-        std::cout << "left_index: " << left_index << ", right_index: " << right_index << "\n";
-
-        if ((right_index - left_index) <= 8)
-            return nullptr;
-
         auto* node = new UnoptimizedBVHNode<T>{primitives};
 
-        node->primitives = primitives;
+        if ((right_index - left_index) <= 8) {
+            return node;
+        }
 
         node->left_index  = left_index;
         node->right_index = right_index;
@@ -130,10 +127,7 @@ namespace Oxy::Renderer {
 
         auto middle = (left_index + right_index) / 2;
 
-        std::cout << "recurse left\n";
-        node->left_node = build_bvh<T>(primitives, left_index, middle);
-
-        std::cout << "recurse right\n";
+        node->left_node  = build_bvh<T>(primitives, left_index, middle);
         node->right_node = build_bvh<T>(primitives, middle, right_index);
 
         return node;
