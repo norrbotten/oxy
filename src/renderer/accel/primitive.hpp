@@ -33,7 +33,7 @@ namespace Oxy::Renderer {
         const auto& p1() const { return m_p1; }
         const auto& p2() const { return m_p2; }
 
-        const auto normal() const { return m_normal; }
+        const auto normal(const glm::dvec3&) const { return m_normal; }
 
         const auto& midpoint() const { return m_midpoint; }
 
@@ -78,13 +78,15 @@ namespace Oxy::Renderer {
             : m_center(center)
             , m_radius(radius) {}
 
-        const auto normal(glm::dvec3 point) { return (point - m_center) / m_radius; }
+        const auto normal(glm::dvec3 point) const { return (point - m_center) / m_radius; }
 
         const auto& midpoint() const { return m_center; }
 
         std::pair<glm::dvec3, glm::dvec3> bbox() const {
             return {m_center - glm::dvec3(m_radius), m_center + glm::dvec3(m_radius)};
         }
+
+        bool intersect_ray(const glm::dvec3& orig, const glm::dvec3& dir, double& t) const;
 
     private:
         glm::dvec3 m_center;

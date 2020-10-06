@@ -225,7 +225,7 @@ namespace Oxy::Application {
 
     template <>
     struct ui_event<RenderControlStart> {
-        void operator()(App& app) { app.renderer().start_render(); }
+        void operator()(App& app) { app.renderer().start_render(1); }
     };
 
     template <>

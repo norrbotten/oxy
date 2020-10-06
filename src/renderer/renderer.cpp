@@ -48,7 +48,14 @@ namespace Oxy::Renderer {
             std::cout << triangles.size() << " triangles\n";
         }
 
+        std::vector<Sphere> spheres = {
+            Sphere(glm::dvec3(-0.2, 0, 0), 0.1),
+            Sphere(glm::dvec3(0, 0, 0), 0.1),
+            Sphere(glm::dvec3(0.2, 0, 0), 0.1),
+        };
+
         m_integrator->accel().triangle_bvh().build(triangles);
+        m_integrator->accel().sphere_bvh().build(spheres);
 
         m_film.clear();
     }

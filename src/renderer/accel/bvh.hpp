@@ -50,8 +50,8 @@ namespace Oxy::Renderer {
         glm::dvec3 bbox_min;
         glm::dvec3 bbox_max;
 
-        UnoptimizedBVHNode<T>* left_node;
-        UnoptimizedBVHNode<T>* right_node;
+        UnoptimizedBVHNode<T>* left_node  = nullptr;
+        UnoptimizedBVHNode<T>* right_node = nullptr;
 
         ~UnoptimizedBVHNode() {
             delete left_node;
@@ -79,16 +79,12 @@ namespace Oxy::Renderer {
     }
 
     template <typename T>
-    UnoptimizedBVHNode<T>* build_bvh(std::vector<T>& primitives, size_t left_index,
-                                     size_t right_index) {
+    UnoptimizedBVHNode<T>* build_bvh_generic(std::vector<T>& primitives, size_t left_index,
+                                             size_t right_index) {
 
         assert(right_index > left_index);
 
         auto* node = new UnoptimizedBVHNode<T>{primitives};
-
-        if ((right_index - left_index) <= 8) {
-            return node;
-        }
 
         node->left_index  = left_index;
         node->right_index = right_index;
@@ -97,6 +93,10 @@ namespace Oxy::Renderer {
 
         node->bbox_min = min_bbox;
         node->bbox_max = max_bbox;
+
+        if ((right_index - left_index) <= 8) {
+            return node;
+        }
 
         const auto begin = primitives.begin() + left_index;
         const auto end   = primitives.begin() + right_index;
@@ -127,10 +127,65 @@ namespace Oxy::Renderer {
 
         auto middle = (left_index + right_index) / 2;
 
-        node->left_node  = build_bvh<T>(primitives, left_index, middle);
-        node->right_node = build_bvh<T>(primitives, middle, right_index);
+        node->left_node  = build_bvh_generic<T>(primitives, left_index, middle);
+        node->right_node = build_bvh_generic<T>(primitives, middle, right_index);
 
         return node;
+    }
+
+    template <typename T>
+    bool dumb_bvh_traverse_generic(UnoptimizedBVHNode<T>* bvh, const std::vector<T>& primitives,
+                                   const glm::dvec3& origin, const glm::dvec3& dir,
+                                   IntersectionResult& res) {
+        IntersectionResult tmp_res;
+        glm::dvec3         hitnormal;
+
+        UnoptimizedBVHNode<T>* stack[2048] = {0};
+        int                    stack_ptr   = 0;
+
+        stack[stack_ptr++] = bvh;
+
+        while (stack_ptr != 0) {
+            auto node = stack[--stack_ptr];
+
+            double dummy;
+            if (ray_vs_aabb(origin, dir, node->bbox_min, node->bbox_max, dummy)) {
+                bool is_leaf = (node->left_node == nullptr) && (node->right_node == nullptr);
+
+                if (is_leaf) {
+                    for (auto it = primitives.begin() + node->left_index;
+                         it != primitives.begin() + node->right_index; it++) {
+
+                        double t;
+                        if (it->intersect_ray(origin, dir, t)) {
+                            if (t < tmp_res.t) {
+                                tmp_res.hit = true;
+                                tmp_res.t   = t;
+                                hitnormal   = it->normal(origin + dir * t);
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (node->left_node != nullptr)
+                        stack[stack_ptr++] = node->left_node;
+
+                    if (node->right_node != nullptr)
+                        stack[stack_ptr++] = node->right_node;
+                }
+            }
+        }
+
+        if (tmp_res.hit) {
+            res.hit       = tmp_res.hit;
+            res.t         = tmp_res.t;
+            res.hitnormal = hitnormal;
+            res.hitpos    = origin + dir * tmp_res.t;
+
+            return true;
+        }
+
+        return false;
     }
 
     template <Primitives T>
