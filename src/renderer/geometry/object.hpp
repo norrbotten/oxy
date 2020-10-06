@@ -1,10 +1,15 @@
 #pragma once
 
+#include <utility>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 #include "renderer/utils/intersection_result.hpp"
+
+#include "renderer/accel/bvh.hpp"
+#include "renderer/accel/primitive_traits.hpp"
 
 namespace Oxy::Renderer {
 
@@ -14,8 +19,15 @@ namespace Oxy::Renderer {
 
         virtual bool setup() { return false; }
 
-        virtual bool intersects_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                                    IntersectionResult& res) const = 0;
+        virtual bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
+                                   IntersectionResult& res) const = 0;
+
+        virtual BoundingBox bbox() const = 0;
+
+        glm::dvec3 midpoint() const {
+            auto [min, max] = bbox();
+            return 0.5 * (min + max);
+        };
 
         void set_transform(const glm::dmat4& transform) {
             m_transform     = transform;

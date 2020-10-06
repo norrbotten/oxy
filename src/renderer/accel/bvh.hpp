@@ -67,7 +67,7 @@ namespace Oxy::Renderer {
         glm::dvec3 max(std::numeric_limits<double>::lowest());
 
         for (auto it = primitives.begin() + start; it != primitives.begin() + end; it++) {
-            auto [bbox_min, bbox_max] = (*it).bbox();
+            auto [bbox_min, bbox_max] = PrimitiveTraits::bbox(*it);
 
             for (int axis = 0; axis < 3; axis++) {
                 min[axis] = std::min(min[axis], bbox_min[axis]);
@@ -105,10 +105,10 @@ namespace Oxy::Renderer {
 
         for (int i = 0; i < 3; i++) {
             auto [min, max] = std::minmax_element(begin, end, [i](auto tri1, auto tri2) {
-                return tri1.midpoint()[i] < tri2.midpoint()[i];
+                return PrimitiveTraits::midpoint(tri1)[i] < PrimitiveTraits::midpoint(tri2)[i];
             });
 
-            auto len = (*max).midpoint()[i] - (*min).midpoint()[i];
+            auto len = PrimitiveTraits::midpoint(*max)[i] - PrimitiveTraits::midpoint(*min)[i];
 
             if (len > longest_len) {
                 longest_len  = len;
@@ -120,7 +120,8 @@ namespace Oxy::Renderer {
 
         // sort along the longest axis
         std::sort(begin, end, [longest_axis](auto tri1, auto tri2) {
-            return tri1.midpoint()[longest_axis] < tri2.midpoint()[longest_axis];
+            return PrimitiveTraits::midpoint(tri1)[longest_axis] <
+                   PrimitiveTraits::midpoint(tri2)[longest_axis];
         });
 
         auto middle = (left_index + right_index) / 2;
@@ -165,7 +166,7 @@ namespace Oxy::Renderer {
                             if (t < tmp_res.t) {
                                 tmp_res.hit = true;
                                 tmp_res.t   = t;
-                                hitnormal   = it->normal(origin + dir * t);
+                                hitnormal   = PrimitiveTraits::normal(*it, origin + dir * t);
                             }
                         }
                     }

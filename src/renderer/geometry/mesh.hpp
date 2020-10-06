@@ -15,8 +15,10 @@ namespace Oxy::Renderer {
         Mesh(const std::vector<Triangle>& tris);
         ~Mesh();
 
-        virtual bool intersects_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                                    IntersectionResult& res) const override;
+        virtual bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
+                                   IntersectionResult& res) const override;
+
+        virtual std::pair<glm::dvec3, glm::dvec3> bbox() const override;
 
         virtual bool setup() override;
 

@@ -38,8 +38,8 @@ namespace Oxy::Renderer {
         return true;
     }
 
-    bool Mesh::intersects_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                              IntersectionResult& res) const {
+    bool Mesh::intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
+                             IntersectionResult& res) const {
 
         BVHTraverseResult bvh_res;
 
@@ -55,6 +55,11 @@ namespace Oxy::Renderer {
         }
 
         return false;
+    }
+
+    std::pair<glm::dvec3, glm::dvec3> Mesh::bbox() const {
+        assert(m_bvh != nullptr);
+        return {m_bvh->bbox_min, m_bvh->bbox_max};
     }
 
 } // namespace Oxy::Renderer

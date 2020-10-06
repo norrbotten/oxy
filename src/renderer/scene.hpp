@@ -10,6 +10,8 @@
 
 #include "renderer/geometry/object.hpp"
 
+#include "renderer/accel/bvh.hpp"
+
 namespace Oxy::Renderer {
 
     class Scene {

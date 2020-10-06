@@ -1,5 +1,7 @@
 #pragma once
 
+#include <random>
+
 #include <glm/glm.hpp>
 
 namespace Oxy::Renderer {
@@ -15,6 +17,9 @@ namespace Oxy::Renderer {
 
     class Camera {
     public:
+        Camera()
+            : m_dist(0.0, 1.0) {}
+
         void set_fov(double fov_in_degrees) {
             m_fov = 1.0 / std::tan(3.1416 / 180.0 * fov_in_degrees * 0.5);
         }
@@ -39,8 +44,11 @@ namespace Oxy::Renderer {
         CameraRay get_ray(int x, int y, int width, int height) {
             auto aspect = (double)height / (double)width;
 
-            auto xf = 2.0 * ((double)x / (double)width - 0.5);
-            auto yf = 2.0 * aspect * ((double)y / (double)height - 0.5);
+            auto tent_x = m_dist(m_re);
+            auto tent_y = m_dist(m_re);
+
+            auto xf = 2.0 * (((double)x + tent_x) / (double)width - 0.5);
+            auto yf = 2.0 * aspect * (((double)y + tent_y) / (double)height - 0.5);
 
             auto dir = glm::normalize(m_forward * m_fov + m_left * xf - m_up * yf);
 
@@ -55,6 +63,9 @@ namespace Oxy::Renderer {
         glm::dvec3 m_up;
 
         double m_fov;
+
+        std::uniform_real_distribution<double> m_dist;
+        std::default_random_engine             m_re;
     };
 
 } // namespace Oxy::Renderer

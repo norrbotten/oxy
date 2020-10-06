@@ -4,7 +4,11 @@
 
 #include <glm/glm.hpp>
 
+#include "renderer/accel/primitive_traits.hpp"
+
 namespace Oxy::Renderer {
+
+    using BoundingBox = std::pair<glm::dvec3, glm::dvec3>;
 
     enum class Primitives {
         Triangle,
@@ -12,9 +16,7 @@ namespace Oxy::Renderer {
     };
 
     template <Primitives PrimitiveType>
-    class Primitive final {
-        std::pair<glm::dvec3, glm::dvec3> get_bbox() const;
-    };
+    class Primitive final {};
 
     template <>
     class Primitive<Primitives::Triangle> final {
@@ -37,7 +39,7 @@ namespace Oxy::Renderer {
 
         const auto& midpoint() const { return m_midpoint; }
 
-        std::pair<glm::dvec3, glm::dvec3> bbox() const { return {m_box_min, m_box_max}; }
+        BoundingBox bbox() const { return {m_box_min, m_box_max}; }
 
         bool intersect_ray(const glm::dvec3& orig, const glm::dvec3& dir, double& t) const;
 
@@ -95,5 +97,35 @@ namespace Oxy::Renderer {
 
     using Triangle = Primitive<Primitives::Triangle>;
     using Sphere   = Primitive<Primitives::Sphere>;
+
+    template <>
+    inline BoundingBox PrimitiveTraits::bbox(Triangle tri) {
+        return tri.bbox();
+    }
+
+    template <>
+    inline glm::dvec3 PrimitiveTraits::midpoint(Triangle tri) {
+        return tri.midpoint();
+    }
+
+    template <>
+    inline glm::dvec3 PrimitiveTraits::normal(Triangle tri, const glm::dvec3& hitpos) {
+        return tri.normal(hitpos);
+    }
+
+    template <>
+    inline BoundingBox PrimitiveTraits::bbox(Sphere sph) {
+        return sph.bbox();
+    }
+
+    template <>
+    inline glm::dvec3 PrimitiveTraits::midpoint(Sphere sph) {
+        return sph.midpoint();
+    }
+
+    template <>
+    inline glm::dvec3 PrimitiveTraits::normal(Sphere sph, const glm::dvec3& hitpos) {
+        return sph.normal(hitpos);
+    }
 
 } // namespace Oxy::Renderer

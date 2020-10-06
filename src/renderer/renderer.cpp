@@ -15,18 +15,16 @@ namespace Oxy::Renderer {
         auto model_transform = glm::translate(glm::dmat4(1.0), glm::dvec3(0, 0, 0));
         model->set_transform(model_transform);
 
-        for (int y = -2000; y < 2000; y += 100) {
-            for (int x = -2000; x < 2000; x += 100) {
-
-                auto transform = glm::translate(glm::dmat4(1.0), glm::dvec3(x, y, 0.0));
-
+        for (int y = -200; y < 200; y += 100) {
+            for (int x = -200; x < 200; x += 100) {
                 auto instance = new MeshInstance(model);
-                instance->set_transform(transform);
+                instance->set_transform(glm::translate(glm::dmat4(1.0), glm::dvec3(x, y, 0.0)));
                 m_scene.add_object(instance);
             }
         }
 
-        m_scene.add_object(model);
+        model->setup();
+
         m_scene.setup();
 
         camera().set_fov(50);
@@ -42,34 +40,7 @@ namespace Oxy::Renderer {
         m_film.resize(width, height);
     }
 
-    void OxyRenderer::select_integrator() {
-        /*
-        std::vector<Triangle> triangles;
-
-        if (auto err = Parsers::parse_stl("./baby_yoda.stl", triangles); err.has_value()) {
-            std::cout << err.value() << "\n";
-        }
-        else {
-            std::cout << triangles.size() << " triangles\n";
-        }
-
-        std::vector<Sphere> spheres;
-
-        for (int i = 0; i < 359; i += 30) {
-            auto r = (double)i * (3.1416 / 180.0);
-            spheres.push_back(Sphere(glm::dvec3(glm::cos(r), glm::sin(r), 0) * 40.0, 6));
-        }
-
-        // m_integrator->accel().triangle_bvh().build(triangles);
-        // m_integrator->accel().sphere_bvh().build(spheres);
-
-        camera().set_fov(50);
-        camera().set_pos(glm::dvec3(-8.9, -104, 79) * 1.4);
-        camera().aim(glm::dvec3(0, 0, 44.5));
-
-        m_film.clear();
-        */
-    }
+    void OxyRenderer::select_integrator() {}
 
     void OxyRenderer::start_render(unsigned int num_threads) {
         if (!m_continous_sampling && m_samples_done > m_samples_to_do)
