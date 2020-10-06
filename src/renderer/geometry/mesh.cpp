@@ -1,5 +1,7 @@
 #include "renderer/geometry/mesh.hpp"
 
+#include "renderer/parsers/stl.hpp"
+
 namespace Oxy::Renderer {
 
     Mesh::Mesh(const std::string& filename)

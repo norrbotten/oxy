@@ -10,8 +10,8 @@ namespace Oxy::Renderer {
         bool   hit = false;
         double t   = std::numeric_limits<double>::max();
 
-        glm::dvec3 hitpos    = glm::dvec3();
-        glm::dvec3 hitnormal = glm::dvec3();
+        glm::dvec3 hitpos{};
+        glm::dvec3 hitnormal{};
 
         Object* hitobj = nullptr;
     };

@@ -9,6 +9,7 @@
 
 #include "renderer/context.hpp"
 #include "renderer/scene.hpp"
+
 #include "renderer/utils/sample_film.hpp"
 
 namespace Oxy::Renderer {

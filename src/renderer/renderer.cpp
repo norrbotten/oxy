@@ -1,11 +1,23 @@
 #include "renderer/renderer.hpp"
 
+#include "renderer/geometry/mesh.hpp"
+
 namespace Oxy::Renderer {
 
     OxyRenderer::OxyRenderer()
         : m_scene(m_ctx)
         , m_running(false)
-        , m_state(WorkerState::Stopped) {}
+        , m_state(WorkerState::Stopped) {
+
+        m_scene.add_object(new Mesh("./baby_yoda.stl"));
+        m_scene.setup();
+
+        camera().set_fov(50);
+        camera().set_pos(glm::dvec3(-8.9, -104, 79) * 1.4);
+        camera().aim(glm::dvec3(0, 0, 44.5));
+
+        m_film.clear();
+    }
 
     void OxyRenderer::set_render_resolution(int width, int height) {
         m_ctx.width  = width;

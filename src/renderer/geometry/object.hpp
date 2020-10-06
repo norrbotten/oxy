@@ -46,11 +46,11 @@ namespace Oxy::Renderer {
         }
 
     private:
-        glm::dmat4 m_transform     = glm::dmat4();
-        glm::dmat4 m_inv_transform = glm::dmat4();
+        glm::dmat4 m_transform{1.0};
+        glm::dmat4 m_inv_transform{1.0};
 
-        glm::dquat m_quat     = glm::dquat();
-        glm::dquat m_inv_quat = glm::dquat();
+        glm::dquat m_quat{1.0, 0.0, 0.0, 0.0};
+        glm::dquat m_inv_quat{1.0, 0.0, 0.0, 0.0};
     };
 
 } // namespace Oxy::Renderer

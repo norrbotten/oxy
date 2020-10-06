@@ -6,9 +6,6 @@
 #include "renderer/geometry/object.hpp"
 
 #include "renderer/accel/bvh.hpp"
-#include "renderer/accel/primitive.hpp"
-
-#include "renderer/parsers/stl.hpp"
 
 namespace Oxy::Renderer {
 

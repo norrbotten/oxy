@@ -5,10 +5,10 @@
 
 #include "renderer/context.hpp"
 
-#include "renderer/geometry/object.hpp"
-
 #include "renderer/utils/camera.hpp"
 #include "renderer/utils/color.hpp"
+
+#include "renderer/geometry/object.hpp"
 
 namespace Oxy::Renderer {
 
@@ -19,12 +19,14 @@ namespace Oxy::Renderer {
 
         ~Scene();
 
-        template <typename T, std::enable_if<std::is_base_of<Object, T>::value>>
+        template <typename T>
         void add_object(T* obj) {
             m_objects.push_back((Object*)obj);
         }
 
         auto num_objects() const { return m_objects.size(); }
+
+        void setup();
 
         Color get_sample(CameraRay ray);
 

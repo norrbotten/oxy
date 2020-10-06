@@ -1,4 +1,4 @@
-#include "color.hpp"
+#include "renderer/utils/color.hpp"
 
 namespace Oxy::Renderer {
 

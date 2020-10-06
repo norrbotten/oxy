@@ -1,4 +1,4 @@
-#include "scene.hpp"
+#include "renderer/scene.hpp"
 
 namespace Oxy::Renderer {
 
@@ -30,6 +30,12 @@ namespace Oxy::Renderer {
         }
 
         return Color();
+    }
+
+    void Scene::setup() {
+        for (auto obj : m_objects) {
+            obj->setup();
+        }
     }
 
 } // namespace Oxy::Renderer

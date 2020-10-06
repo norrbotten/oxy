@@ -1,4 +1,4 @@
-#include "primitive.hpp"
+#include "renderer/accel/primitive.hpp"
 
 namespace Oxy::Renderer {
 
