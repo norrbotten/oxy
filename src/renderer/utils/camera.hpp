@@ -15,6 +15,10 @@ namespace Oxy::Renderer {
 
     class Camera {
     public:
+        void set_fov(double fov_in_degrees) {
+            m_fov = 1.0 / std::tan(3.1416 / 180.0 * fov_in_degrees * 0.5);
+        }
+
         void set_pos(glm::dvec3 pos) { m_origin = pos; }
 
         void set_dir(glm::dvec3 dir) {
@@ -38,7 +42,7 @@ namespace Oxy::Renderer {
             auto xf = 2.0 * ((double)x / (double)width - 0.5);
             auto yf = 2.0 * aspect * ((double)y / (double)height - 0.5);
 
-            auto dir = glm::normalize(m_forward + m_left * xf - m_up * yf);
+            auto dir = glm::normalize(m_forward * m_fov + m_left * xf - m_up * yf);
 
             return CameraRay(m_origin, dir);
         }
@@ -49,6 +53,8 @@ namespace Oxy::Renderer {
         glm::dvec3 m_forward;
         glm::dvec3 m_left;
         glm::dvec3 m_up;
+
+        double m_fov;
     };
 
 } // namespace Oxy::Renderer

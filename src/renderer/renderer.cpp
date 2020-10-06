@@ -5,63 +5,47 @@
 namespace Oxy::Renderer {
 
     OxyRenderer::OxyRenderer()
-        : m_integrator(nullptr)
+        : m_scene(m_ctx)
         , m_running(false)
         , m_state(WorkerState::Stopped) {}
 
-    OxyRenderer::~OxyRenderer() {
-        if (m_integrator != nullptr)
-            delete m_integrator;
-    }
-
     void OxyRenderer::set_render_resolution(int width, int height) {
-        if (m_integrator != nullptr)
-            m_integrator->set_resolution(width, height);
-
+        m_ctx.width  = width;
+        m_ctx.height = height;
         m_film.resize(width, height);
     }
 
-    void OxyRenderer::select_integrator(Integrators integrator) {
-        if (m_integrator != nullptr)
-            delete m_integrator;
-
-        switch (integrator) {
-        case Integrators::Fractal:
-            m_integrator = new FractalIntegrator(m_film.width(), m_film.height(), m_film);
-            break;
-
-        case Integrators::Buddhabrot:
-            m_integrator = new BuddhabrotIntegrator(m_film.width(), m_film.height(), m_film);
-            break;
-
-        case Integrators::Preview:
-            m_integrator = new PreviewIntegrator(m_film.width(), m_film.height(), m_film);
-            break;
-        }
-
+    void OxyRenderer::select_integrator() {
+        /*
         std::vector<Triangle> triangles;
 
-        if (auto err = Parsers::parse_stl("./bunny.stl", triangles); err.has_value()) {
+        if (auto err = Parsers::parse_stl("./baby_yoda.stl", triangles); err.has_value()) {
             std::cout << err.value() << "\n";
         }
         else {
             std::cout << triangles.size() << " triangles\n";
         }
 
-        std::vector<Sphere> spheres = {
-            Sphere(glm::dvec3(-0.2, 0, 0), 0.1),
-            Sphere(glm::dvec3(0, 0, 0), 0.1),
-            Sphere(glm::dvec3(0.2, 0, 0), 0.1),
-        };
+        std::vector<Sphere> spheres;
 
-        m_integrator->accel().triangle_bvh().build(triangles);
-        m_integrator->accel().sphere_bvh().build(spheres);
+        for (int i = 0; i < 359; i += 30) {
+            auto r = (double)i * (3.1416 / 180.0);
+            spheres.push_back(Sphere(glm::dvec3(glm::cos(r), glm::sin(r), 0) * 40.0, 6));
+        }
+
+        // m_integrator->accel().triangle_bvh().build(triangles);
+        // m_integrator->accel().sphere_bvh().build(spheres);
+
+        camera().set_fov(50);
+        camera().set_pos(glm::dvec3(-8.9, -104, 79) * 1.4);
+        camera().aim(glm::dvec3(0, 0, 44.5));
 
         m_film.clear();
+        */
     }
 
     void OxyRenderer::start_render(unsigned int num_threads) {
-        if (m_samples_done >= m_samples_to_do)
+        if (!m_continous_sampling && m_samples_done > m_samples_to_do)
             return;
 
         m_running = true;

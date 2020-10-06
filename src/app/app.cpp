@@ -288,6 +288,12 @@ namespace Oxy::Application {
 
         ImGui::End();
 
+        ImGui::Begin("Renderer Diagnostics");
+
+        // ImGui::Text("Triangle count: %i", m_renderer.scene().triangle_count());
+
+        ImGui::End();
+
         m_preview_layer.draw();
         ImGui::SFML::Render(m_window);
 
@@ -305,11 +311,7 @@ namespace Oxy::Application {
     void App::run() {
         ImGui::SFML::Init(m_window);
 
-        m_renderer.select_integrator(Renderer::Integrators::Preview);
-        resize_render_preview(512, 512);
-
-        m_renderer.camera().set_pos(glm::dvec3(-0.7, -0.2, 0.15));
-        m_renderer.camera().aim(glm::dvec3(0, -0.08, 0.05));
+        ui_event<WindowResized>{}(*this, 1024, 1024);
 
         ui_event<Initialize>{}(*this);
 

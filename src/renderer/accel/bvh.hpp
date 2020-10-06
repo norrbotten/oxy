@@ -82,8 +82,6 @@ namespace Oxy::Renderer {
     UnoptimizedBVHNode<T>* build_bvh_generic(std::vector<T>& primitives, size_t left_index,
                                              size_t right_index) {
 
-        assert(right_index > left_index);
-
         auto* node = new UnoptimizedBVHNode<T>{primitives};
 
         node->left_index  = left_index;
