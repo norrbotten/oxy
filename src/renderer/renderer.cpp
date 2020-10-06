@@ -1,6 +1,7 @@
 #include "renderer/renderer.hpp"
 
 #include "renderer/geometry/mesh.hpp"
+#include "renderer/geometry/mesh_instance.hpp"
 
 namespace Oxy::Renderer {
 
@@ -9,12 +10,28 @@ namespace Oxy::Renderer {
         , m_running(false)
         , m_state(WorkerState::Stopped) {
 
-        m_scene.add_object(new Mesh("./baby_yoda.stl"));
+        auto model = new Mesh("./baby_yoda.stl");
+
+        auto model_transform = glm::translate(glm::dmat4(1.0), glm::dvec3(0, 0, 0));
+        model->set_transform(model_transform);
+
+        for (int y = -2000; y < 2000; y += 100) {
+            for (int x = -2000; x < 2000; x += 100) {
+
+                auto transform = glm::translate(glm::dmat4(1.0), glm::dvec3(x, y, 0.0));
+
+                auto instance = new MeshInstance(model);
+                instance->set_transform(transform);
+                m_scene.add_object(instance);
+            }
+        }
+
+        m_scene.add_object(model);
         m_scene.setup();
 
         camera().set_fov(50);
-        camera().set_pos(glm::dvec3(-8.9, -104, 79) * 1.4);
-        camera().aim(glm::dvec3(0, 0, 44.5));
+        camera().set_pos(glm::dvec3(-350, -350, 250));
+        camera().aim(glm::dvec3(0, 0, 16));
 
         m_film.clear();
     }
