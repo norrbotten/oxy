@@ -1,7 +1,5 @@
 #include "renderer/renderer.hpp"
 
-#include "renderer/parsers/stl.hpp"
-
 namespace Oxy::Renderer {
 
     OxyRenderer::OxyRenderer()

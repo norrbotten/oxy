@@ -1,5 +1,7 @@
 #pragma once
 
+/*
+
 #include <numeric>
 
 #include <glm/glm.hpp>
@@ -27,3 +29,4 @@ namespace Oxy::Renderer {
     };
 
 } // namespace Oxy::Renderer
+*/

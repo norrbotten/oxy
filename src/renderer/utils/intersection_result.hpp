@@ -4,12 +4,16 @@
 
 namespace Oxy::Renderer {
 
+    class Object; // forwarddecl
+
     struct IntersectionResult {
         bool   hit = false;
         double t   = std::numeric_limits<double>::max();
 
-        glm::dvec3 hitpos;
-        glm::dvec3 hitnormal;
+        glm::dvec3 hitpos    = glm::dvec3();
+        glm::dvec3 hitnormal = glm::dvec3();
+
+        Object* hitobj = nullptr;
     };
 
 } // namespace Oxy::Renderer

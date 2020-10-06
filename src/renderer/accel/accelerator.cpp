@@ -1,5 +1,7 @@
 #include "accelerator.hpp"
 
+/*
+
 namespace Oxy::Renderer {
 
     bool Accelerator::intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
@@ -29,3 +31,4 @@ namespace Oxy::Renderer {
     }
 
 } // namespace Oxy::Renderer
+*/

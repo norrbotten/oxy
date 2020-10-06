@@ -3,12 +3,12 @@
 #include <algorithm>
 #include <immintrin.h>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 #include <glm/glm.hpp>
 
 #include "renderer/accel/primitive.hpp"
-#include "renderer/utils/intersection_result.hpp"
 
 namespace Oxy::Renderer {
 
@@ -131,12 +131,18 @@ namespace Oxy::Renderer {
         return node;
     }
 
+    struct BVHTraverseResult {
+        bool       hit = false;
+        double     t   = std::numeric_limits<double>::max();
+        glm::dvec3 hitnormal;
+    };
+
     template <typename T>
     bool dumb_bvh_traverse_generic(UnoptimizedBVHNode<T>* bvh, const std::vector<T>& primitives,
                                    const glm::dvec3& origin, const glm::dvec3& dir,
-                                   IntersectionResult& res) {
-        IntersectionResult tmp_res;
-        glm::dvec3         hitnormal;
+                                   BVHTraverseResult& res) {
+        BVHTraverseResult tmp_res;
+        glm::dvec3        hitnormal;
 
         UnoptimizedBVHNode<T>* stack[2048] = {0};
         int                    stack_ptr   = 0;
@@ -178,47 +184,11 @@ namespace Oxy::Renderer {
             res.hit       = tmp_res.hit;
             res.t         = tmp_res.t;
             res.hitnormal = hitnormal;
-            res.hitpos    = origin + dir * tmp_res.t;
 
             return true;
         }
 
         return false;
     }
-
-    template <Primitives T>
-    class BVH final {
-    public:
-        bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                           IntersectionResult& res) const;
-
-        void build(const std::vector<Primitive<T>>& primitives);
-    };
-
-    template <>
-    class BVH<Primitives::Triangle> final {
-    public:
-        bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                           IntersectionResult& res) const;
-
-        void build(const std::vector<Triangle>& triangles);
-
-    private:
-        std::vector<Triangle>         m_triangles;
-        UnoptimizedBVHNode<Triangle>* m_bvh;
-    };
-
-    template <>
-    class BVH<Primitives::Sphere> final {
-    public:
-        bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
-                           IntersectionResult& res) const;
-
-        void build(const std::vector<Sphere>& spheres);
-
-    private:
-        std::vector<Sphere>         m_spheres;
-        UnoptimizedBVHNode<Sphere>* m_bvh;
-    };
 
 } // namespace Oxy::Renderer
