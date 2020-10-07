@@ -10,8 +10,9 @@ namespace Oxy::Renderer {
         , m_running(false)
         , m_state(WorkerState::Stopped) {
 
-        auto model = new Mesh("./baby_yoda.stl");
+        auto model = new Mesh("./bunny.stl");
 
+        /*
         auto model_transform = glm::translate(glm::dmat4(1.0), glm::dvec3(0, 0, 0));
         model->set_transform(model_transform);
 
@@ -22,14 +23,14 @@ namespace Oxy::Renderer {
                 m_scene.add_object(instance);
             }
         }
+        */
 
-        model->setup();
-
+        m_scene.add_object(model);
         m_scene.setup();
 
         camera().set_fov(50);
-        camera().set_pos(glm::dvec3(-350, -350, 250));
-        camera().aim(glm::dvec3(0, 0, 16));
+        camera().set_pos(glm::dvec3(-70, -150, 100));
+        camera().aim(glm::dvec3(0, -50, 60));
 
         m_film.clear();
     }

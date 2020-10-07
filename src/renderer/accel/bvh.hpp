@@ -37,6 +37,29 @@ namespace Oxy::Renderer {
         return true;
     }
 
+    inline bool ray_vs_sphere(const glm::dvec3& orig, const glm::dvec3& dir,
+                              const glm::dvec3& center, double radius, double& t) {
+
+        auto oc   = orig - center;
+        auto a    = glm::dot(dir, dir);
+        auto b    = 2.0 * glm::dot(oc, dir);
+        auto c    = glm::dot(oc, oc) - radius * radius;
+        auto disc = b * b - 4 * a * c;
+
+        if (disc < 0)
+            return false;
+
+        auto t1 = (-b + std::sqrt(disc)) / (2.0 * a);
+        auto t2 = (-b - std::sqrt(disc)) / (2.0 * a);
+
+        if (t1 < 0) // inside the sphere, return the far point
+            t = t2;
+        else
+            t = std::min(t1, t2);
+
+        return true;
+    }
+
     template <typename T>
     struct UnoptimizedBVHNode {
         UnoptimizedBVHNode(std::vector<T>& prims)
@@ -47,22 +70,23 @@ namespace Oxy::Renderer {
         size_t left_index;
         size_t right_index;
 
-        glm::dvec3 bbox_min;
-        glm::dvec3 bbox_max;
+        BoundingSphere bsphere;
+        BoundingBox    bbox;
 
         UnoptimizedBVHNode<T>* left_node  = nullptr;
         UnoptimizedBVHNode<T>* right_node = nullptr;
 
         ~UnoptimizedBVHNode() {
-            delete left_node;
-            delete right_node;
+            if (left_node != nullptr)
+                delete left_node;
+
+            if (right_node != nullptr)
+                delete right_node;
         }
     };
 
     template <typename T>
-    std::pair<glm::dvec3, glm::dvec3> get_bbox(const std::vector<T>& primitives, size_t start,
-                                               size_t end) {
-
+    BoundingBox get_bbox(const std::vector<T>& primitives, size_t start, size_t end) {
         glm::dvec3 min(std::numeric_limits<double>::max());
         glm::dvec3 max(std::numeric_limits<double>::lowest());
 
@@ -79,6 +103,23 @@ namespace Oxy::Renderer {
     }
 
     template <typename T>
+    BoundingSphere get_bsphere(const std::vector<T>& primitives, size_t start, size_t end) {
+        glm::dvec3 middle(0.0);
+
+        for (auto it = primitives.begin() + start; it != primitives.begin() + end; it++)
+            middle += it->midpoint();
+
+        middle /= (double)(end - start);
+
+        double radius = 0;
+
+        for (auto it = primitives.begin() + start; it != primitives.begin() + end; it++)
+            radius = std::max(radius, glm::distance(middle, it->midpoint()) + it->bsphere().second);
+
+        return {middle, radius};
+    }
+
+    template <typename T>
     UnoptimizedBVHNode<T>* build_bvh_generic(std::vector<T>& primitives, size_t left_index,
                                              size_t right_index) {
 
@@ -89,8 +130,8 @@ namespace Oxy::Renderer {
 
         auto [min_bbox, max_bbox] = get_bbox<T>(primitives, left_index, right_index);
 
-        node->bbox_min = min_bbox;
-        node->bbox_max = max_bbox;
+        node->bsphere = get_bsphere<T>(primitives, left_index, right_index);
+        node->bbox    = {min_bbox, max_bbox};
 
         if ((right_index - left_index) <= 8) {
             return node;
@@ -104,11 +145,7 @@ namespace Oxy::Renderer {
         double longest_len  = 0;
 
         for (int i = 0; i < 3; i++) {
-            auto [min, max] = std::minmax_element(begin, end, [i](auto tri1, auto tri2) {
-                return PrimitiveTraits::midpoint(tri1)[i] < PrimitiveTraits::midpoint(tri2)[i];
-            });
-
-            auto len = PrimitiveTraits::midpoint(*max)[i] - PrimitiveTraits::midpoint(*min)[i];
+            auto len = max_bbox[i] - min_bbox[i];
 
             if (len > longest_len) {
                 longest_len  = len;
@@ -154,7 +191,9 @@ namespace Oxy::Renderer {
             auto node = stack[--stack_ptr];
 
             double dummy;
-            if (ray_vs_aabb(origin, dir, node->bbox_min, node->bbox_max, dummy)) {
+            if (ray_vs_aabb(origin, dir, node->bbox.first, node->bbox.second, dummy)) {
+                // if (ray_vs_sphere(origin, dir, node->bsphere.first, node->bsphere.second, dummy))
+                // {
                 bool is_leaf = (node->left_node == nullptr) && (node->right_node == nullptr);
 
                 if (is_leaf) {

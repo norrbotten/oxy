@@ -10,14 +10,13 @@
 
 #include "renderer/geometry/object.hpp"
 
-#include "renderer/accel/bvh.hpp"
-
 namespace Oxy::Renderer {
 
     class Scene {
     public:
         Scene(RenderContext& ctx)
-            : m_ctx(ctx) {}
+            : m_ctx(ctx)
+            , m_bvh(nullptr) {}
 
         ~Scene();
 
@@ -35,7 +34,8 @@ namespace Oxy::Renderer {
     private:
         RenderContext& m_ctx;
 
-        std::vector<Object*> m_objects;
+        UnoptimizedBVHNode<Object*>* m_bvh;
+        std::vector<Object*>         m_objects;
     };
 
 } // namespace Oxy::Renderer

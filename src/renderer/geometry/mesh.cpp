@@ -57,9 +57,4 @@ namespace Oxy::Renderer {
         return false;
     }
 
-    std::pair<glm::dvec3, glm::dvec3> Mesh::bbox() const {
-        assert(m_bvh != nullptr);
-        return {m_bvh->bbox_min, m_bvh->bbox_max};
-    }
-
 } // namespace Oxy::Renderer

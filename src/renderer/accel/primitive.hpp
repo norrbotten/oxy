@@ -8,7 +8,8 @@
 
 namespace Oxy::Renderer {
 
-    using BoundingBox = std::pair<glm::dvec3, glm::dvec3>;
+    using BoundingBox    = std::pair<glm::dvec3, glm::dvec3>;
+    using BoundingSphere = std::pair<glm::dvec3, double>;
 
     enum class Primitives {
         Triangle,
@@ -39,7 +40,15 @@ namespace Oxy::Renderer {
 
         const auto& midpoint() const { return m_midpoint; }
 
-        BoundingBox bbox() const { return {m_box_min, m_box_max}; }
+        BoundingBox    bbox() const { return {m_box_min, m_box_max}; }
+        BoundingSphere bsphere() const {
+            auto middle = midpoint();
+            auto radius =
+                std::max(glm::distance(middle, p0()),
+                         std::max(glm::distance(middle, p1()), glm::distance(middle, p2())));
+
+            return {middle, radius * 2};
+        }
 
         bool intersect_ray(const glm::dvec3& orig, const glm::dvec3& dir, double& t) const;
 
@@ -84,9 +93,11 @@ namespace Oxy::Renderer {
 
         const auto& midpoint() const { return m_center; }
 
-        std::pair<glm::dvec3, glm::dvec3> bbox() const {
+        BoundingBox bbox() const {
             return {m_center - glm::dvec3(m_radius), m_center + glm::dvec3(m_radius)};
         }
+
+        BoundingSphere bsphere() const { return {m_center, m_radius}; }
 
         bool intersect_ray(const glm::dvec3& orig, const glm::dvec3& dir, double& t) const;
 
@@ -104,6 +115,11 @@ namespace Oxy::Renderer {
     }
 
     template <>
+    inline BoundingSphere PrimitiveTraits::bsphere(Triangle tri) {
+        return tri.bsphere();
+    }
+
+    template <>
     inline glm::dvec3 PrimitiveTraits::midpoint(Triangle tri) {
         return tri.midpoint();
     }
@@ -113,9 +129,16 @@ namespace Oxy::Renderer {
         return tri.normal(hitpos);
     }
 
+    //
+
     template <>
     inline BoundingBox PrimitiveTraits::bbox(Sphere sph) {
         return sph.bbox();
+    }
+
+    template <>
+    inline BoundingSphere PrimitiveTraits::bsphere(Sphere sph) {
+        return sph.bsphere();
     }
 
     template <>

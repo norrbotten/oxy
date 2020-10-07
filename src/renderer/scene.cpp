@@ -1,15 +1,21 @@
 #include "renderer/scene.hpp"
 
+#define USE_SCENE_BVH 1
+
 namespace Oxy::Renderer {
 
     Scene::~Scene() {
         for (auto obj : m_objects)
             delete obj;
+
+        if (m_bvh != nullptr)
+            delete m_bvh;
     }
 
     Color Scene::get_sample(CameraRay ray) {
         IntersectionResult res;
 
+#if USE_SCENE_BVH == 0
         for (auto obj : m_objects) {
             IntersectionResult obj_res;
 
@@ -23,11 +29,14 @@ namespace Oxy::Renderer {
         }
 
         if (res.hit) {
-            res.hitpos    = res.hitobj->local_to_world(res.hitpos);
-            res.hitnormal = res.hitobj->local_to_world_dir(res.hitnormal);
-
             return Color(-glm::dot(res.hitnormal, ray.dir));
         }
+
+#else
+        if (dumb_bvh_traverse_objectptr(m_bvh, m_objects, ray.origin, ray.dir, res)) {
+            return Color(-glm::dot(res.hitnormal, ray.dir));
+        }
+#endif
 
         return Color();
     }
@@ -36,6 +45,10 @@ namespace Oxy::Renderer {
         for (auto obj : m_objects) {
             obj->setup();
         }
+
+#if USE_SCENE_BVH == 1
+        m_bvh = build_bvh_generic<Object*>(m_objects, 0, m_objects.size());
+#endif
     }
 
 } // namespace Oxy::Renderer
