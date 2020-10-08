@@ -22,11 +22,19 @@ namespace Oxy::Renderer {
         virtual bool intersect_ray(const glm::dvec3& origin, const glm::dvec3& dir,
                                    IntersectionResult& res) const = 0;
 
-        virtual BoundingBox    bbox() const    = 0;
-        virtual BoundingSphere bsphere() const = 0;
+        virtual BoundingBox bbox() const       = 0;
+        virtual BoundingBox local_bbox() const = 0;
+
+        virtual BoundingSphere bsphere() const       = 0;
+        virtual BoundingSphere local_bsphere() const = 0;
 
         glm::dvec3 midpoint() const {
             auto [min, max] = bbox();
+            return 0.5 * (min + max);
+        };
+
+        glm::dvec3 local_midpoint() const {
+            auto [min, max] = local_bbox();
             return 0.5 * (min + max);
         };
 
@@ -42,23 +50,23 @@ namespace Oxy::Renderer {
             m_inv_quat = glm::inverse(m_quat);
         }
 
-        inline glm::dvec3 world_to_local(const glm::dvec3& world) {
+        inline glm::dvec3 world_to_local(const glm::dvec3& world) const {
             return m_inv_transform * glm::dvec4(world, 1);
         }
 
-        inline glm::dvec3 local_to_world(const glm::dvec3& local) {
+        inline glm::dvec3 local_to_world(const glm::dvec3& local) const {
             return m_transform * glm::dvec4(local, 1);
         }
 
-        inline glm::dvec3 world_to_local_dir(const glm::dvec3& world_dir) {
+        inline glm::dvec3 world_to_local_dir(const glm::dvec3& world_dir) const {
             return m_inv_quat * world_dir;
         }
 
-        inline glm::dvec3 local_to_world_dir(const glm::dvec3& local_dir) {
+        inline glm::dvec3 local_to_world_dir(const glm::dvec3& local_dir) const {
             return m_inv_quat * local_dir;
         }
 
-    private:
+    protected:
         glm::dmat4 m_transform{1.0};
         glm::dmat4 m_inv_transform{1.0};
 
@@ -116,8 +124,9 @@ namespace Oxy::Renderer {
 
         glm::dvec3 middle(0.0);
 
-        for (auto it = primitives.begin() + start; it != primitives.begin() + end; it++)
+        for (auto it = primitives.begin() + start; it != primitives.begin() + end; it++) {
             middle += (*it)->midpoint();
+        }
 
         middle /= (double)(end - start);
 
@@ -225,6 +234,7 @@ namespace Oxy::Renderer {
         }
 
         if (tmp_res.hit) {
+            res.hitobj    = tmp_res.hitobj;
             res.hit       = tmp_res.hit;
             res.t         = tmp_res.t;
             res.hitnormal = hitnormal;

@@ -151,4 +151,8 @@ namespace Oxy::Renderer {
         return sph.normal(hitpos);
     }
 
+    BoundingBox    get_transformed_bbox(const BoundingBox& bbox, const glm::dmat4& transform);
+    BoundingSphere get_transformed_bsphere(const BoundingSphere& bsphere,
+                                           const glm::dmat4&     transform);
+
 } // namespace Oxy::Renderer

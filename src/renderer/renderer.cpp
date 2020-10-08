@@ -12,10 +12,11 @@ namespace Oxy::Renderer {
 
         auto model = new Mesh("./bunny.stl");
 
-        /*
-        auto model_transform = glm::translate(glm::dmat4(1.0), glm::dvec3(0, 0, 0));
+        auto model_transform = glm::rotate(glm::dmat4(1.0), 1.78, glm::dvec3(0, 0, 1));
         model->set_transform(model_transform);
+        m_scene.add_object(model);
 
+        /*
         for (int y = -200; y < 200; y += 100) {
             for (int x = -200; x < 200; x += 100) {
                 auto instance = new MeshInstance(model);
@@ -23,13 +24,13 @@ namespace Oxy::Renderer {
                 m_scene.add_object(instance);
             }
         }
+        model->setup();
         */
 
-        m_scene.add_object(model);
         m_scene.setup();
 
         camera().set_fov(50);
-        camera().set_pos(glm::dvec3(-70, -150, 100));
+        camera().set_pos(glm::dvec3(-170, -250, 100));
         camera().aim(glm::dvec3(0, -50, 60));
 
         m_film.clear();

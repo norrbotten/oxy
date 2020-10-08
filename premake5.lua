@@ -10,6 +10,7 @@ workspace "bigbong"
 
     filter { "configurations:debug" }
         symbols "On"
+        optimize "Off"
     
     filter { "configurations:release" }
         symbols "Off"

@@ -31,10 +31,9 @@ namespace Oxy::Renderer {
         if (res.hit) {
             return Color(-glm::dot(res.hitnormal, ray.dir));
         }
-
 #else
         if (dumb_bvh_traverse_objectptr(m_bvh, m_objects, ray.origin, ray.dir, res)) {
-            return Color(-glm::dot(res.hitnormal, ray.dir));
+            return Color(-glm::dot(res.hitnormal, res.hitobj->local_to_world_dir(ray.dir)));
         }
 #endif
 

@@ -21,10 +21,21 @@ namespace Oxy::Renderer {
 
         virtual BoundingBox bbox() const override {
             assert(m_bvh != nullptr);
+            return get_transformed_bbox(m_bvh->bbox, m_transform);
+        }
+
+        virtual BoundingBox local_bbox() const override {
+            assert(m_bvh != nullptr);
             return m_bvh->bbox;
         }
 
         virtual BoundingSphere bsphere() const override {
+            assert(m_bvh != nullptr);
+            auto bsphere = m_bvh->bsphere;
+            return {local_to_world(bsphere.first), bsphere.second};
+        }
+
+        virtual BoundingSphere local_bsphere() const override {
             assert(m_bvh != nullptr);
             return m_bvh->bsphere;
         }

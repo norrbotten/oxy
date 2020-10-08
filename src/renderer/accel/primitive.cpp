@@ -49,4 +49,55 @@ namespace Oxy::Renderer {
         return true;
     }
 
+    BoundingBox get_transformed_bbox(const BoundingBox& bbox, const glm::dmat4& transform) {
+        auto& [min, max] = bbox;
+
+        // 8 vertices of the bbox cube
+        /*
+        min x, min y, min z
+        max x, min y, min z
+        min x, max y, min z
+        min x, min y, max x
+        max x, max y, min z
+        min x, max y, max z
+        max x, min y, max z
+        max x, max y, max z
+        */
+
+        /* clang-format off */
+        glm::dvec3 points[8] = {
+            {min.x, min.y, min.z},
+            {max.x, min.y, min.z},
+            {min.x, max.y, min.z},
+            {min.x, min.y, max.z},
+            {max.x, max.y, min.z},
+            {min.x, max.y, max.z},
+            {max.x, min.y, max.z},
+            {max.x, max.y, max.z},
+        };
+        /* clang-format on */
+
+        for (int i = 0; i < 8; i++)
+            points[i] = transform * glm::dvec4(points[i], 1.0);
+
+        glm::dvec3 new_min(std::numeric_limits<double>::max());
+        glm::dvec3 new_max(std::numeric_limits<double>::lowest());
+
+        for (int i = 0; i < 8; i++) {
+            for (int axis = 0; axis < 3; axis++) {
+                new_min[axis] = std::min(new_min[axis], points[i][axis]);
+                new_max[axis] = std::max(new_max[axis], points[i][axis]);
+            }
+        }
+
+        // theres probably a better way of doing this
+
+        return {new_min, new_max};
+    }
+
+    BoundingSphere get_transformed_bsphere(const BoundingSphere& bsphere,
+                                           const glm::dmat4&     transform) {
+        return {transform * glm::dvec4(bsphere.first, 1.0), bsphere.second};
+    }
+
 } // namespace Oxy::Renderer

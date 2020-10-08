@@ -43,7 +43,10 @@ namespace Oxy::Renderer {
 
         BVHTraverseResult bvh_res;
 
-        if (dumb_bvh_traverse_generic<Triangle>(m_bvh, m_triangles, origin, dir, bvh_res)) {
+        auto tr_origin = local_to_world(origin);
+        auto tr_dir    = local_to_world_dir(dir);
+
+        if (dumb_bvh_traverse_generic<Triangle>(m_bvh, m_triangles, tr_origin, tr_dir, bvh_res)) {
             res.hit    = true;
             res.hitobj = (Object*)this;
 
